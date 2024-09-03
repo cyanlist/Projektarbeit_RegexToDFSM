@@ -1,4 +1,4 @@
-package regToDEA.main.logic.postfix;
+package geje1017.logic.postfix;
 
 /**
  * Provides a utility to validate the syntactic correctness of an infix expression.

@@ -1,9 +1,9 @@
-package regToDEA.main.gui;
+package geje1017.gui;
 
-import regToDEA.main.logic.finiteStateMachine.FSMStructure;
-import regToDEA.main.logic.finiteStateMachine.FSMVisualizer;
+import geje1017.logic.finiteStateMachine.FSMStructure;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 
 public class FSMResultPanel extends JPanel {
@@ -13,16 +13,15 @@ public class FSMResultPanel extends JPanel {
     private final JPanel detailsPanel;
 
     public FSMResultPanel(FSMGroup fsmGroup) {
+
         this.fsmGroup = fsmGroup;
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(10, 50, 10, 50), // Äußerer Rand
-                BorderFactory.createEtchedBorder() // Innerer geätzter Rand
-        ));
 
         this.detailsPanel = new JPanel();
         this.detailsPanel.setLayout(new GridBagLayout());
         this.add(detailsPanel);
+
+        // this.detailsPanel.setBackground(Color.WHITE);
 
         this.toggleDetails(); // Initialize the view based on the collapse state
     }
@@ -57,13 +56,21 @@ public class FSMResultPanel extends JPanel {
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
-        this.detailsPanel.add(new JLabel("Step: " + fsm.getExpression()), gbc);
+        // this.detailsPanel.add(new JLabel("Step: " + fsm.getExpression()), gbc);
 
         // Visualizer setup
         gbc.gridy = 2;
         gbc.gridwidth = 1;
         gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.CENTER;
         this.detailsPanel.add(new FSMVisualizer(fsm), gbc);
+
+        Border outerInnerBorder = BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(10, 50, 10, 50), // Äußerer Rand
+                BorderFactory.createEtchedBorder() // Innerer geätzter Rand
+        );
+        Border titledBorder = BorderFactory.createTitledBorder(outerInnerBorder, "Step ...: " + fsm.getExpression());
+        this.setBorder(titledBorder);
     }
 
     private void addExpandedView() {
@@ -86,23 +93,46 @@ public class FSMResultPanel extends JPanel {
     }
 
     private void addFSMDetails(GridBagConstraints gbc, FSMStructure fsm, String description, int startRow) {
+
+        gbc.insets = new Insets(10, 5, 5, 5);
+
         // Label with expression
         gbc.gridx = 0;
         gbc.gridy = startRow;
         gbc.gridwidth = 2;
         this.detailsPanel.add(new JLabel(description + ": " + fsm.getExpression()), gbc);
 
-        // Visualizer setup
-        gbc.gridy = startRow + 1;
-        gbc.gridwidth = 1;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        this.detailsPanel.add(new FSMVisualizer(fsm), gbc);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        splitPane.setResizeWeight(0.5); // Stellt sicher, dass beide Hälften 50% Platz bekommen
+        splitPane.setContinuousLayout(true); // Verhindert das "Springen" beim Anpassen der Größe
+
+        FSMVisualizer visualizer = new FSMVisualizer(fsm);
+        splitPane.setLeftComponent(visualizer);
 
         // Definition area setup
         JTextArea definitionArea = new JTextArea(fsm.toString());
-        this.setupTextArea(definitionArea);
-        gbc.gridx = 1;
-        this.detailsPanel.add(new JScrollPane(definitionArea), gbc);
+        setupTextArea(definitionArea);
+        JScrollPane scrollPane = new JScrollPane(definitionArea);
+        splitPane.setRightComponent(scrollPane);
+
+        gbc.gridx = 0;
+        gbc.gridy = startRow + 1;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.BOTH;
+        detailsPanel.add(splitPane, gbc);
+
+//        // Visualizer setup
+//        gbc.gridy = startRow + 1;
+//        gbc.gridwidth = 1;
+//        gbc.insets = new Insets(5, 5, 5, 5);
+//        this.detailsPanel.add(new FSMVisualizer(fsm), gbc);
+//        // gbc.fill = GridBagConstraints.NONE;
+//
+//        // Definition area setup
+//        JTextArea definitionArea = new JTextArea(fsm.toString());
+//        this.setupTextArea(definitionArea);
+//        gbc.gridx = 1;
+//        this.detailsPanel.add(new JScrollPane(definitionArea), gbc);
 
         // Explanation area setup
         JTextArea explanationArea = new JTextArea("Explanation for " + description, 5, 40);

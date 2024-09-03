@@ -1,10 +1,10 @@
-package regToDEA.main.logic.postfix;
+package geje1017.logic.postfix;
 
-import regToDEA.main.gui.FSMGroup;
-import regToDEA.main.gui.FSMStorage;
-import regToDEA.main.logic.finiteStateMachine.FSMStructure;
-import regToDEA.main.logic.finiteStateMachine.FSMOperation;
-import regToDEA.main.logic.finiteStateMachine.State;
+import geje1017.gui.FSMGroup;
+import geje1017.gui.FSMStorage;
+import geje1017.logic.finiteStateMachine.FSMOperator.*;
+import geje1017.logic.finiteStateMachine.FSMStructure;
+import geje1017.logic.finiteStateMachine.State;
 
 import java.util.Stack;
 
@@ -32,14 +32,14 @@ public class ExpressionEvaluator {
                 fsm = processOperator(currentChar, stack);
                 if (fsm != null) {
                     FSMStructure operationFSM = fsm;
-                    FSMStructure deterministicFSM = FSMOperation.toDeterministicFsm(operationFSM);
-                    FSMStructure minimizedFSM = FSMOperation.minimize(deterministicFSM);
+                    FSMStructure deterministicFSM = FSMDeterminizer.toDeterministicFsm(operationFSM);
+                    FSMStructure minimizedFSM = FSMMinimizer.minimize(deterministicFSM);
                     FSMGroup group = new FSMGroup(operationFSM, deterministicFSM, minimizedFSM);
                     storage.addFSMGroup(group);
                     stack.push(minimizedFSM);
                 }
             } else if (InputManager.isOperand(currentChar)) {
-                fsm = FSMOperation.convertInputCharacter(currentChar);
+                fsm = FSMSymbolConverter.convertInputCharacter(currentChar);
                 stack.push(fsm);
                 storage.addElementaryFSM(fsm);
             }
@@ -54,18 +54,18 @@ public class ExpressionEvaluator {
 
         if (InputManager.OperatorType.KLEENE_CLOSURE.getSymbol() == operator) {
             fsm1 = stack.pop();
-            result = FSMOperation.applyKleeneClosure(fsm1);
+            result = FSMClosureApplier.applyKleeneClosure(fsm1);
         } else if (InputManager.OperatorType.POSITIVE_CLOSURE.getSymbol() == operator) {
             fsm1 = stack.pop();
-            result = FSMOperation.applyPositiveClosure(fsm1);
+            result = FSMClosureApplier.applyPositiveClosure(fsm1);
         } else if (InputManager.OperatorType.CONCATENATION.getSymbol() == operator) {
             fsm2 = stack.pop();
             fsm1 = stack.pop();
-            result = FSMOperation.concatenate(fsm1, fsm2);
+            result = FSMConcatenator.concatenate(fsm1, fsm2);
         } else if (InputManager.OperatorType.ALTERNATION.getSymbol() == operator) {
             fsm2 = stack.pop();
             fsm1 = stack.pop();
-            result = FSMOperation.alternate(fsm1, fsm2);
+            result = FSMAlternator.alternate(fsm1, fsm2);
         }
         return result;
     }

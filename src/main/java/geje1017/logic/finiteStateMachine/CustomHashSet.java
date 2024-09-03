@@ -1,4 +1,4 @@
-package regToDEA.main.logic.finiteStateMachine;
+package geje1017.logic.finiteStateMachine;
 
 import java.util.HashSet;
 import java.util.Iterator;

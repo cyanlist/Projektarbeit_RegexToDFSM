@@ -1,4 +1,7 @@
-package geje1017.logic.finiteStateMachine;
+package geje1017.gui;
+
+import geje1017.logic.finiteStateMachine.FSMStructure;
+import geje1017.logic.finiteStateMachine.State;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,14 +30,11 @@ public class FSMVisualizer extends JPanel {
         Map<State, Point> positions = new HashMap<>();
         for (int i = 0; i < states.size(); i++) {
             int x = (i % cols) * CELL_SIZE + CELL_SIZE / 2;
-            int y = ((i / cols) * CELL_SIZE + CELL_SIZE / 2) + CELL_SIZE / 8;
+            int y = ((i / cols) * CELL_SIZE + CELL_SIZE / 2); //+ CELL_SIZE / 8;
             positions.put(states.get(i), new Point(x, y));
         }
         // Todo: Super seltsamer Effekt auf die GUI
         setPreferredSize(new Dimension((cols) * CELL_SIZE, rows * CELL_SIZE));
-        setSize(new Dimension((cols) * CELL_SIZE, rows * CELL_SIZE));
-        setMaximumSize(new Dimension((cols) * CELL_SIZE, rows * CELL_SIZE));
-        setMinimumSize(new Dimension((cols) * CELL_SIZE, rows * CELL_SIZE));
         return positions;
     }
 

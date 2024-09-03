@@ -1,4 +1,4 @@
-package regToDEA.main.gui;
+package geje1017.gui;
 
 import javax.swing.*;
 

@@ -1,6 +1,6 @@
-package regToDEA.main.gui;
+package geje1017.gui;
 
-import regToDEA.main.logic.finiteStateMachine.FSMStructure;
+import geje1017.logic.finiteStateMachine.FSMStructure;
 
 // Angepasste FSMGroup Klasse
 public class FSMGroup {

@@ -1,11 +1,4 @@
-package geje1017.logic.finiteStateMachine.Operation;
-
-import geje1017.logic.finiteStateMachine.CustomHashSet;
-import geje1017.logic.finiteStateMachine.FSMStructure;
-import geje1017.logic.finiteStateMachine.State;
-import geje1017.logic.postfix.InputManager;
-
-import java.util.*;
+package geje1017.logic.finiteStateMachine.FSMOperator;
 
 public class FSMOperation {
 

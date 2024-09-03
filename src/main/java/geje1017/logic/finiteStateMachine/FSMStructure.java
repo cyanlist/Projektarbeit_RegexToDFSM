@@ -1,4 +1,4 @@
-package regToDEA.main.logic.finiteStateMachine;
+package geje1017.logic.finiteStateMachine;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,9 +21,7 @@ public class FSMStructure {
     public FSMStructure() {
         this.transitions = new TreeMap<>(Comparator
                 .comparing(State::isStartState, Comparator.reverseOrder())
-                // Dann nach der ersten Nummer sortieren
                 .thenComparing(State::getFirstNumber)
-                // Dann nach der String-Repräsentation sortieren, falls notwendig
                 .thenComparing(State::toString));
     }
 
@@ -35,7 +33,6 @@ public class FSMStructure {
      * @param targetState The ending state of the transition.
      */
     public void addTransition(State sourceState, Set<String> inputSymbol, State targetState) {
-        // TODO: "Konstellationen" besser definieren
         if (sourceState != null) {
             transitions.putIfAbsent(sourceState, new HashMap<>());
             if (targetState != null) {

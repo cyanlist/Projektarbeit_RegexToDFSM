@@ -1,4 +1,4 @@
-package geje1017.logic.finiteStateMachine.Operation;
+package geje1017.logic.finiteStateMachine.FSMOperator;
 
 import geje1017.logic.finiteStateMachine.FSMStructure;
 import geje1017.logic.finiteStateMachine.State;
@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class FSMCopier extends FSMOperation {
+public class FSMCopier {
 
     /**
      * Creates a deep copy of a finite state machine (FSM).

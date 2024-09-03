@@ -1,11 +1,10 @@
-package regToDEA.main.gui;
+package geje1017.gui;
 
-import regToDEA.main.logic.finiteStateMachine.FSMStructure;
+import geje1017.logic.finiteStateMachine.FSMStructure;
 
 import java.util.ArrayList;
 import java.util.List;
 
-// Neue Klasse FSMStorage, die als Container für alle FSMs dient
 public class FSMStorage {
     private final List<FSMStructure> elementaryFSMs = new ArrayList<>();
     private final List<FSMGroup> fsmGroups = new ArrayList<>();
@@ -28,6 +27,10 @@ public class FSMStorage {
 
     public FSMStructure getResultFsm() {
         int lastElement = fsmGroups.size() - 1;
+
+        if (lastElement < 0) {
+            return elementaryFSMs.get(0);
+        }
         return fsmGroups.get(lastElement).getMinimizedFSM();
     }
 }

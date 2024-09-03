@@ -1,7 +1,7 @@
-package regToDEA.main.gui;
+package geje1017.gui;
 
-import regToDEA.main.logic.finiteStateMachine.FSMStructure;
-import regToDEA.main.logic.postfix.ExpressionEvaluator;
+import geje1017.logic.finiteStateMachine.FSMStructure;
+import geje1017.logic.postfix.ExpressionEvaluator;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

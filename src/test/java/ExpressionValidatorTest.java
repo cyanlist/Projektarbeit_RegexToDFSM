@@ -1,7 +1,7 @@
-import org.junit.jupiter.api.Test;
+import geje1017.logic.postfix.ExpressionValidator;
+import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
-import regToDEA.main.logic.postfix.ExpressionValidator;
 
 public class ExpressionValidatorTest {
 

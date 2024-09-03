@@ -1,6 +1,6 @@
-package regToDEA.main.gui;
+package geje1017.gui;
 
-import regToDEA.main.logic.postfix.ExpressionValidator;
+import geje1017.logic.postfix.ExpressionValidator;
 
 import javax.swing.*;
 import java.awt.*;

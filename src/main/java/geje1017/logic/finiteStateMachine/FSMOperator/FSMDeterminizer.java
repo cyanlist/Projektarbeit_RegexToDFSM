@@ -1,4 +1,4 @@
-package geje1017.logic.finiteStateMachine.Operation;
+package geje1017.logic.finiteStateMachine.FSMOperator;
 
 import geje1017.logic.finiteStateMachine.CustomHashSet;
 import geje1017.logic.finiteStateMachine.FSMStructure;
@@ -6,9 +6,9 @@ import geje1017.logic.finiteStateMachine.State;
 
 import java.util.*;
 
-import static geje1017.logic.finiteStateMachine.Operation.FSMCopier.copyFsm;
+import static geje1017.logic.finiteStateMachine.FSMOperator.FSMCopier.copyFsm;
 
-public class FSMDeterminizer extends FSMOperation {
+public class FSMDeterminizer {
 
     /**
      * Converts a non-deterministic finite automaton (NFA) to a deterministic finite automaton (DFA)

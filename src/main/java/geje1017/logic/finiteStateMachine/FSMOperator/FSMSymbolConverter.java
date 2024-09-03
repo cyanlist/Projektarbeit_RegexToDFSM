@@ -1,4 +1,4 @@
-package geje1017.logic.finiteStateMachine.Operation;
+package geje1017.logic.finiteStateMachine.FSMOperator;
 
 import geje1017.logic.finiteStateMachine.FSMStructure;
 import geje1017.logic.finiteStateMachine.State;
@@ -7,7 +7,7 @@ import geje1017.logic.postfix.InputManager;
 import java.util.Collections;
 import java.util.HashSet;
 
-public class FSMSymbolConverter extends FSMOperation{
+public class FSMSymbolConverter{
 
     /**
      * Converts the input symbol to an FSM.

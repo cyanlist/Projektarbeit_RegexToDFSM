@@ -1,4 +1,4 @@
-package regToDEA.main.gui;
+package geje1017.gui;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
@@ -7,7 +7,7 @@ import java.awt.*;
 
 public class Frame extends JFrame {
 
-    private static final String DEFAULT_REGEX = "i.e.: (a|b)+c* or \\e or \\0";
+    private static final String DEFAULT_REGEX = "i.e.: (a|b)+c*";
     private static final Dimension MIN_SIZE = new Dimension(800, 500);
     private static final Dimension PREF_SIZE = new Dimension(1280, 720);
 
@@ -55,16 +55,18 @@ public class Frame extends JFrame {
 
             this.resultPanel = new JPanel();
             this.resultPanel.setLayout(new BoxLayout(this.resultPanel, BoxLayout.Y_AXIS));
-            this.resultPanel.setBorder(BorderFactory.createTitledBorder("Final result"));
+            // this.resultPanel.setBorder(BorderFactory.createTitledBorder("Final result"));
 
             this.solutionPanel = new JPanel();
             this.solutionPanel.setLayout(new BoxLayout(this.solutionPanel, BoxLayout.Y_AXIS));
-            this.solutionPanel.setBorder(BorderFactory.createTitledBorder("Solution"));
+            // this.solutionPanel.setBorder(BorderFactory.createTitledBorder("Solution"));
             this.solutionPanel.setVisible(false);
 
             this.toggleSolutionButton = new JButton("Show Solution Path");
             this.toggleSolutionButton.setAlignmentX(Component.CENTER_ALIGNMENT);
             this.toggleSolutionButton.addActionListener(e -> toggleSolutionPath());
+
+            this.toggleSolutionPath();
 
             JPanel scrollContent = new JPanel();
             scrollContent.setLayout(new BoxLayout(scrollContent, BoxLayout.Y_AXIS));

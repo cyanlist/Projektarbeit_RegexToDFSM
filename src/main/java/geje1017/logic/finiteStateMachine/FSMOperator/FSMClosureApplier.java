@@ -1,19 +1,19 @@
-package geje1017.logic.finiteStateMachine.Operation;
+package geje1017.logic.finiteStateMachine.FSMOperator;
 
 import geje1017.logic.finiteStateMachine.FSMStructure;
 import geje1017.logic.finiteStateMachine.State;
 
-import static geje1017.logic.finiteStateMachine.Operation.FSMCopier.copyFsm;
-import static geje1017.logic.finiteStateMachine.Operation.FSMSymbolConverter.convertEmptyString;
+import static geje1017.logic.finiteStateMachine.FSMOperator.FSMCopier.copyFsm;
+import static geje1017.logic.finiteStateMachine.FSMOperator.FSMSymbolConverter.convertEmptyString;
 
-public class FSMClosureApplier extends FSMOperation{
+public class FSMClosureApplier{
 
     /**
-     * Applies positive closure to a deterministic FSM.
-     * Positive closure means that the FSM can repeat its entire sequence of states one or more times.
+     * Applies positive closure (also known as "plus" closure) to a deterministic finite state machine (FSM).
+     * The positive closure of an FSM allows it to repeat its pattern one or more times.
      *
      * @param fsm The deterministic FSM to apply positive closure to.
-     * @return The FSM after applying positive closure.
+     * @return A new FSM instance representing the original FSM with positive closure applied.
      */
     public static FSMStructure applyPositiveClosure(FSMStructure fsm) {
 
@@ -30,21 +30,21 @@ public class FSMClosureApplier extends FSMOperation{
             }
         }));
 
-        System.out.println(positiveClosureFsm);
-
         positiveClosureFsm.setExpression("(" + copyFsm.getExpression() + ")+");
         return positiveClosureFsm;
     }
 
     /**
      * Applies Kleene closure to a deterministic FSM.
+     * Kleene closure (denoted as '*') allows the FSM to repeat its sequence zero or more times,
+     * effectively including the option to accept the empty string.
      *
      * @param fsm The deterministic FSM to apply Kleene closure to.
-     * @return The FSM after applying Kleene closure.
+     * @return A new FSM instance representing the original FSM with Kleene closure applied.
      */
     public static FSMStructure applyKleeneClosure(FSMStructure fsm) {
 
-        String temp = fsm.getExpression() + "*";
+        String temp = "(" + fsm.getExpression() + ")*";
 
         FSMStructure kleeneClosureFsm = applyPositiveClosure(fsm);
         convertEmptyString(kleeneClosureFsm);

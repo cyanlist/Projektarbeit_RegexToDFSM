@@ -1,7 +1,7 @@
-package regToDEA.main.logic.postfix;
+package geje1017.logic.postfix;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Manages input processing by identifying and categorizing different types
@@ -15,11 +15,11 @@ public class InputManager {
      */
     public enum OperatorType {
         ALTERNATION('|', 1),
-        CONCATENATION(',', 1),
-        KLEENE_CLOSURE('*', 2),
-        POSITIVE_CLOSURE('+', 2),
-        PARENTHESIS_OPEN('(', 3),
-        PARENTHESIS_CLOSE(')', 3);
+        CONCATENATION(',', 2),
+        KLEENE_CLOSURE('*', 3),
+        POSITIVE_CLOSURE('+', 3),
+        PARENTHESIS_OPEN('(', 4),
+        PARENTHESIS_CLOSE(')', 4);
 
         private final char symbol;
         private final int priority;

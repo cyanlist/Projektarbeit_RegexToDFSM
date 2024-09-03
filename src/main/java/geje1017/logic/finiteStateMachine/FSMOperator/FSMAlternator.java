@@ -1,14 +1,47 @@
-package geje1017.logic.finiteStateMachine.Operation;
+package geje1017.logic.finiteStateMachine.FSMOperator;
 
 import geje1017.logic.finiteStateMachine.FSMStructure;
 import geje1017.logic.finiteStateMachine.State;
+import geje1017.logic.postfix.InputManager;
 
 import java.util.Map;
 import java.util.Set;
 
+import static geje1017.logic.finiteStateMachine.FSMOperator.FSMCopier.copyFsm;
+
 public class FSMAlternator {
 
     public static FSMStructure alternate(FSMStructure fsm1, FSMStructure fsm2) {
+        FSMStructure copyFsm1 = copyFsm(fsm1);
+        FSMStructure copyFsm2 = copyFsm(fsm2);
+
+        FSMStructure specialCaseResult = checkSpecialCases(fsm1, fsm2);
+        if (specialCaseResult != null) {
+            return specialCaseResult;
+        }
+
+        return performAlternation(copyFsm1, copyFsm2);
+    }
+
+    private static FSMStructure checkSpecialCases(FSMStructure fsm1, FSMStructure fsm2) {
+        if (fsm1.getExpression().equals(String.valueOf(InputManager.getEmptySet()))) {
+            return fsm2;
+        }
+        if (fsm2.getExpression().equals(String.valueOf(InputManager.getEmptySet()))) {
+            return fsm2;
+        }
+        return null;
+    }
+
+    private static FSMStructure performAlternation(FSMStructure fsm1, FSMStructure fsm2) {
+        FSMStructure alternatedFsm = new FSMStructure();
+        alternatedFsm.addAllTransitions(fsm1.getTransitions());
+        alternatedFsm.addAllTransitions(fsm2.getTransitions());
+        alternatedFsm.setExpression("(" + fsm1.getExpression() + "|" + fsm2.getExpression() + ")");
+        return alternatedFsm;
+    }
+
+    private static FSMStructure performAlternation2(FSMStructure fsm1, FSMStructure fsm2) {
         FSMStructure alternatedFsm = new FSMStructure();
 
         // Neuer Startzustand
@@ -24,7 +57,7 @@ public class FSMAlternator {
         alternatedFsm.addAllTransitions(fsm2.getTransitions());
 
         // Setze den Ausdruck
-        alternatedFsm.setExpression(fsm1.getExpression() + "|" + fsm2.getExpression());
+        alternatedFsm.setExpression("(" + fsm1.getExpression() + "|" + fsm2.getExpression() + ")");
         return alternatedFsm;
     }
 
