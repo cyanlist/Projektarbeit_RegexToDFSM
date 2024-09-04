@@ -3,6 +3,7 @@ package geje1017.gui;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class Frame extends JFrame {
@@ -10,6 +11,8 @@ public class Frame extends JFrame {
     private static final String DEFAULT_REGEX = "i.e.: (a|b)+c*";
     private static final Dimension MIN_SIZE = new Dimension(800, 500);
     private static final Dimension PREF_SIZE = new Dimension(1280, 720);
+
+    private static int margin = 100;
 
     private JPanel mainPanel;
     private JPanel inputPanel;
@@ -30,14 +33,15 @@ public class Frame extends JFrame {
     }
 
     private void initializeFrame() {
-        // Erstelle das Hauptfenster
         this.setMinimumSize(MIN_SIZE);
         this.setPreferredSize(PREF_SIZE);
-        this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(400, 300);
+        this.setSize(800, 600);
+        this.setLocationRelativeTo(null);
         this.mainPanel = new JPanel(new GridBagLayout());
         add(this.mainPanel);
+
+        margin = this.getWidth() / 8;
     }
 
     private void initializeComponents() {
@@ -47,7 +51,12 @@ public class Frame extends JFrame {
         // this.errorLabel = new JLabel("This is an error message");
         // this.errorLabel.setForeground(Color.RED);
 
+//        this.solutionPanel.setBorder(new EmptyBorder(20, 50, 20, 50));
+
         this.scrollPane = new JScrollPane();
+
+        this.inputPanel.setBorder(new EmptyBorder(20, margin, 0, margin));
+        setupScrollPane();
     }
 
     public void setupScrollPane() {
@@ -55,18 +64,14 @@ public class Frame extends JFrame {
 
             this.resultPanel = new JPanel();
             this.resultPanel.setLayout(new BoxLayout(this.resultPanel, BoxLayout.Y_AXIS));
-            // this.resultPanel.setBorder(BorderFactory.createTitledBorder("Final result"));
 
             this.solutionPanel = new JPanel();
             this.solutionPanel.setLayout(new BoxLayout(this.solutionPanel, BoxLayout.Y_AXIS));
-            // this.solutionPanel.setBorder(BorderFactory.createTitledBorder("Solution"));
             this.solutionPanel.setVisible(false);
 
             this.toggleSolutionButton = new JButton("Show Solution Path");
             this.toggleSolutionButton.setAlignmentX(Component.CENTER_ALIGNMENT);
             this.toggleSolutionButton.addActionListener(e -> toggleSolutionPath());
-
-            this.toggleSolutionPath();
 
             JPanel scrollContent = new JPanel();
             scrollContent.setLayout(new BoxLayout(scrollContent, BoxLayout.Y_AXIS));
@@ -82,13 +87,15 @@ public class Frame extends JFrame {
             JPanel scrollContent = new JPanel();
             this.scrollPane.setViewportView(scrollContent);
         }
+        this.scrollPane.setBorder(new EmptyBorder(0, margin, 20, margin));
     }
 
     private void layoutComponents() {
         GridBagConstraints inputGbc = new GridBagConstraints();
-        inputGbc.insets = new Insets(0, 5, 0, 5); // Setzt ein Margin um die Komponenten innerhalb des Input-Panels
+        inputGbc.insets = new Insets(0, 5, 0, 5);
 
         JLabel label = new JLabel("Enter your regular expression here:");
+        label.setFont(new Font("Arial", Font.BOLD, 14));
         inputGbc.gridx = 0;
         inputGbc.gridy = 0;
         inputGbc.gridwidth = 2;

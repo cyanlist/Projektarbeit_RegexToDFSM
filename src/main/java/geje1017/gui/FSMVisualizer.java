@@ -5,7 +5,6 @@ import geje1017.logic.finiteStateMachine.State;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.QuadCurve2D;
 import java.util.*;
 import java.util.List;
@@ -33,7 +32,6 @@ public class FSMVisualizer extends JPanel {
             int y = ((i / cols) * CELL_SIZE + CELL_SIZE / 2); //+ CELL_SIZE / 8;
             positions.put(states.get(i), new Point(x, y));
         }
-        // Todo: Super seltsamer Effekt auf die GUI
         setPreferredSize(new Dimension((cols) * CELL_SIZE, rows * CELL_SIZE));
         return positions;
     }
@@ -145,13 +143,8 @@ public class FSMVisualizer extends JPanel {
             int midX = (from.x + to.x) / 2;
             int midY = (from.y + to.y) / 2;
 
-            // Adjust label position based on the direction of the line to avoid overlap
-            double angle = Math.atan2(to.y - from.y, to.x - from.x);
-            int offsetX = (int) (height * 0.5 * Math.sin(angle));
-            int offsetY = (int) (height * 0.5 * Math.cos(angle));
-
             // Draw string centered at the adjusted midpoint
-            g2.drawString(input, midX - width / 2 + offsetX, midY + height / 2 - offsetY);
+            g2.drawString(input, midX - width / 2, midY + height / 2);
         }
 
         private static void drawLoop(Graphics2D g2, Point center, Set<String> inputSymbols) {
@@ -161,7 +154,9 @@ public class FSMVisualizer extends JPanel {
 
             drawArrowhead(g2, new Point(center.x + 5, center.y - OVAL_SIZE / 2), Math.PI / 2);
 
-            drawLoopLabel(g2, inputSymbols, center);
+            Point temp = new Point(center.x, center.y - OVAL_SIZE*2);
+
+            drawArrowLabel(g2, inputSymbols, center, temp);
         }
 
         private static void drawLoopLabel(Graphics2D g2, Set<String> inputSymbols, Point center) {
@@ -177,19 +172,13 @@ public class FSMVisualizer extends JPanel {
         }
 
         private static void drawArrowhead(Graphics2D g2, Point tip, double angle) {
-            int arrowLength = 5;
-
+            int arrowLength = 10;
             int x1 = (int) (tip.x - arrowLength * Math.cos(angle + Math.PI / 6));
             int y1 = (int) (tip.y - arrowLength * Math.sin(angle + Math.PI / 6));
             int x2 = (int) (tip.x - arrowLength * Math.cos(angle - Math.PI / 6));
             int y2 = (int) (tip.y - arrowLength * Math.sin(angle - Math.PI / 6));
-
-            GeneralPath path = new GeneralPath();
-            path.moveTo(tip.x, tip.y);
-            path.lineTo(x1, y1);
-            path.moveTo(tip.x, tip.y);
-            path.lineTo(x2, y2);
-            g2.draw(path);
+            g2.drawLine(tip.x, tip.y, x1, y1);
+            g2.drawLine(tip.x, tip.y, x2, y2);
         }
 
         private static Point adjustPoint(Point from, Point to) {

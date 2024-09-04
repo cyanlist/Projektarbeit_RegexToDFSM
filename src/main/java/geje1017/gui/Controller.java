@@ -59,14 +59,16 @@ public class Controller implements ActionListener, KeyListener {
     }
 
     public void displayResultFSM(FSMStructure fsm) {
-        FSMResultPanel resultPanel = new FSMResultPanel(new FSMGroup(fsm, fsm, fsm)); // Simplified for elementary FSMs
+        MinimizedFSMPanel resultPanel = new MinimizedFSMPanel(new FSMGroup(fsm, fsm, fsm)); // Simplified for elementary FSMs
         frame.resultPanel.add(resultPanel);
     }
 
     private void displayElementaryFSMs(List<FSMStructure> currFsm) {
-        for (FSMStructure fsm : currFsm) {
-            addResult(fsm);
-        }
+        ElementaryFSMPanel resultPanel = new ElementaryFSMPanel(currFsm);
+        frame.solutionPanel.add(resultPanel);
+//        for (FSMStructure fsm : currFsm) {
+//            addResult(fsm);
+//        }
     }
 
     private void displayGroupedFSMs(List<FSMGroup> groups) {
