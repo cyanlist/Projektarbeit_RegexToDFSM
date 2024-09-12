@@ -8,19 +8,24 @@ import java.awt.*;
 
 public class Frame extends JFrame {
 
-    private static final String DEFAULT_REGEX = "i.e.: (a|b)+c*";
+    private static final String DEFAULT_REGEX = "i.e.: (a|1+)z*";
     private static final Dimension MIN_SIZE = new Dimension(800, 500);
     private static final Dimension PREF_SIZE = new Dimension(1280, 720);
+
+    public static Dimension TRY;
 
     private static int margin = 100;
 
     private JPanel mainPanel;
     private JPanel inputPanel;
     public TextFieldWithPlaceholder textField;
-    // public JLabel errorLabel;
+    public JLabel errorLabel;
     private JButton convertButton;
     public JPanel resultPanel;
     public JPanel solutionPanel;
+
+    public JPanel defaultPanel;
+
     private JScrollPane scrollPane;
     private JButton toggleSolutionButton;
 
@@ -36,7 +41,7 @@ public class Frame extends JFrame {
         this.setMinimumSize(MIN_SIZE);
         this.setPreferredSize(PREF_SIZE);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(800, 600);
+        this.setSize(800, 400);
         this.setLocationRelativeTo(null);
         this.mainPanel = new JPanel(new GridBagLayout());
         add(this.mainPanel);
@@ -46,12 +51,11 @@ public class Frame extends JFrame {
 
     private void initializeComponents() {
         this.inputPanel = new JPanel(new GridBagLayout());
-        this.textField = new TextFieldWithPlaceholder(DEFAULT_REGEX);
+        this.textField = new TextFieldWithPlaceholder(DEFAULT_REGEX, this);
         this.convertButton = new JButton("Convert");
-        // this.errorLabel = new JLabel("This is an error message");
-        // this.errorLabel.setForeground(Color.RED);
 
-//        this.solutionPanel.setBorder(new EmptyBorder(20, 50, 20, 50));
+        this.errorLabel = new JLabel();
+        this.errorLabel.setForeground(Color.RED);
 
         this.scrollPane = new JScrollPane();
 
@@ -87,7 +91,13 @@ public class Frame extends JFrame {
             JPanel scrollContent = new JPanel();
             this.scrollPane.setViewportView(scrollContent);
         }
+
+
+
+        System.out.println("scrollPane: " + scrollPane.getWidth());
         this.scrollPane.setBorder(new EmptyBorder(0, margin, 20, margin));
+        TRY = scrollPane.getSize();
+        System.out.println("Try: " + TRY.width);
     }
 
     private void layoutComponents() {
@@ -116,12 +126,12 @@ public class Frame extends JFrame {
         inputGbc.fill = GridBagConstraints.NONE;
         inputPanel.add(convertButton, inputGbc);
 
-//        inputGbc.gridx = 0;
-//        inputGbc.gridy = 2;
-//        inputGbc.gridwidth = 2;
-//        // inputGbc.weightx = 1;
-//        inputGbc.fill = GridBagConstraints.WEST;
-//        inputPanel.add(errorLabel, inputGbc);
+        inputGbc.gridx = 0;
+        inputGbc.gridy = 2;
+        inputGbc.gridwidth = 2;
+        // inputGbc.weightx = 1;
+        inputGbc.fill = GridBagConstraints.WEST;
+        inputPanel.add(errorLabel, inputGbc);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -162,12 +172,12 @@ public class Frame extends JFrame {
         repaint();
     }
 
-    public String getInputFieldText() {
-        return this.textField.getText().trim();
+    public void setErrorLabel(String message) {
+        errorLabel.setText(message);
+        errorLabel.setForeground(message.isEmpty() ? Color.BLACK : Color.RED);
     }
 
-    public static void main(String[] args) {
-        FlatLightLaf.setup();
-        SwingUtilities.invokeLater(Frame::new);
+    public String getInputFieldText() {
+        return this.textField.getText().trim();
     }
 }

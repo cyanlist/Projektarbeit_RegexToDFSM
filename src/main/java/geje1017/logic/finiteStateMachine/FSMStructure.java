@@ -13,7 +13,7 @@ public class FSMStructure {
     // Maps a source state to a map of target states and the corresponding transition symbols
     public Map<State, Map<State, Set<String>>> transitions;
     private String expression = "";
-    public String foo = "";
+    private String explanation = "";
 
     /**
      * Constructs a new finite state machine with empty transitions.
@@ -63,7 +63,7 @@ public class FSMStructure {
         transitions.forEach((sourceState, transitionMap) -> {
             transitionMap.forEach((targetState, symbols) -> {
                 symbols.forEach(symbol -> {
-                    res.append("\n\tδ(").append(sourceState).append(", ").append(symbol).append(") = ").append(targetState);
+                    res.append("\n     δ(").append(sourceState).append(", ").append(symbol).append(") = ").append(targetState);
                 });
             });
         });
@@ -117,6 +117,13 @@ public class FSMStructure {
         return getStates().stream().filter(State::isFinalState).collect(Collectors.toSet());
     }
 
+    public void setExplanation(String explanation) {
+        this.explanation = this.explanation + explanation;
+    }
+
+    public String getExplanation() {
+        return explanation;
+    }
 
     public Map<State, Set<String>> getTargetStatesAndSymbols(State sourceState) {
         return this.transitions.getOrDefault(sourceState, Map.of());

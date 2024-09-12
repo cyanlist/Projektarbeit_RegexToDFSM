@@ -9,30 +9,29 @@ import java.util.HashSet;
 
 public class FSMSymbolConverter{
 
-    /**
-     * Converts the input symbol to an FSM.
-     *
-     * @param inputSymbol The input symbol to be converted.
-     * @return The converted FSM.
-     */
-    public static FSMStructure convertInputCharacter(char inputSymbol) {
-        FSMStructure convertedFSM = new FSMStructure();
+        /**
+         * Converts the input symbol to an FSM.
+         *
+         * @param inputSymbol The input symbol to be converted.
+         * @return The converted FSM.
+         */
+        public static FSMStructure convertInputCharacter(char inputSymbol) {
+            FSMStructure convertedFSM = new FSMStructure();
 
-        if (!InputManager.isOperand(inputSymbol)) {
-            throw new IllegalArgumentException("Invalid input symbol: " + inputSymbol);
+            if (!InputManager.isOperand(inputSymbol)) {
+                throw new IllegalArgumentException("Invalid input symbol: " + inputSymbol);
+            }
+            if (inputSymbol == InputManager.getEmptySymbol()) {
+                convertEmptyString(convertedFSM);
+            }
+            else if (inputSymbol == InputManager.getEmptySet()) {
+                convertEmptySet(convertedFSM);
+            }
+            else {
+                convertRegularSymbol(convertedFSM, inputSymbol);
+            }
+            return convertedFSM;
         }
-
-        if (inputSymbol == InputManager.getEmptySymbol()) {
-            convertEmptyString(convertedFSM);
-        }
-        else if (inputSymbol == InputManager.getEmptySet()) {
-            convertEmptySet(convertedFSM);
-        }
-        else {
-            convertRegularSymbol(convertedFSM, inputSymbol);
-        }
-        return convertedFSM;
-    }
 
     /**
      * Handles the case when the input symbol is "e".

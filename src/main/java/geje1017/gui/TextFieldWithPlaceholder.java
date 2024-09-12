@@ -10,12 +10,14 @@ public class TextFieldWithPlaceholder extends JTextField {
 
     private final String placeholder;
     private boolean showingPlaceholder;
+    private Frame parentFrame;
 
-    public TextFieldWithPlaceholder(String placeholder) {
+    public TextFieldWithPlaceholder(String placeholder, Frame frame) {
         this.placeholder = placeholder;
         this.showingPlaceholder = true;
         this.setText(placeholder);
         this.setForeground(Color.GRAY);
+        this.parentFrame = frame; // Frame-Referenz speichern
         showPlaceholderIfNeeded();
         addPlaceholderListeners();
     }
@@ -72,8 +74,10 @@ public class TextFieldWithPlaceholder extends JTextField {
             try {
                 ExpressionValidator.validateInfix(text);
                 setForeground(Color.BLACK);
+                parentFrame.setErrorLabel("");  // Kein Fehler, also leeres Label
             } catch (ExpressionValidator.InvalidExpressionException e) {
                 setForeground(Color.RED);
+                parentFrame.setErrorLabel(e.getMessage());  // Fehlernachricht ins Label schreiben
             }
         }
     }

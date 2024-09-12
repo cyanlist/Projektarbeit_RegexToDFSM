@@ -7,12 +7,17 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * ElementaryFSMPanel is responsible for displaying a list of elementary FSMs in a grid layout.
+ */
 public class ElementaryFSMPanel extends JPanel {
 
+    /**
+     * Constructor to initialize and set up the grid of FSM panels.
+     * @param fsmList List of FSMStructure objects to display.
+     */
     public ElementaryFSMPanel(List<FSMStructure> fsmList) {
-        // Setzen eines Grid-Layouts, das sich dynamisch an die Anzahl der FSMs anpasst
-        int rows = (int) Math.ceil(Math.sqrt(fsmList.size()));
-        setLayout(new GridLayout(rows, 0, 10, 10)); // Grid mit dynamischer Anzahl von Reihen, Spalten basierend auf der Liste, Abstände von 10 Pixel
+        setLayout(new GridLayout(0, 2, 0, 0));
 
         Border outerInnerBorder = BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(40, 0, 0, 0),
@@ -20,17 +25,19 @@ public class ElementaryFSMPanel extends JPanel {
         );
         this.setBorder(BorderFactory.createTitledBorder(outerInnerBorder, "Elementary FSM:"));
 
-        // Erstellen und Hinzufügen der Panels für jede FSM
         for (FSMStructure fsm : fsmList) {
             add(createFSMVisualizerPanel(fsm));
         }
     }
 
+    /**
+     * Creates a panel for visualizing an individual FSM.
+     * @param fsm FSMStructure to visualize.
+     * @return JPanel containing FSM visualization.
+     */
     private JPanel createFSMVisualizerPanel(FSMStructure fsm) {
-        // Ein einzelnes Panel, das den FSMVisualizer enthält
         JPanel panel = new FSMVisualizer(fsm);
-        Border emptyBorder = BorderFactory.createEmptyBorder();
-        panel.setBorder( BorderFactory.createTitledBorder(emptyBorder, fsm.getExpression()));
+        panel.setBorder(BorderFactory.createTitledBorder(fsm.getExpression()));
         return panel;
     }
 }

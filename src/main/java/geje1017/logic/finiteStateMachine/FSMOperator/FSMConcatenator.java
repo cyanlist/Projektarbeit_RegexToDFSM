@@ -69,8 +69,12 @@ public class FSMConcatenator {
      * @return The concatenated FSM.
      */
     private static FSMStructure performConcatenation(FSMStructure fsm1, FSMStructure fsm2) {
+
         FSMStructure concatenatedFsm = new FSMStructure();
         concatenatedFsm.setExpression(fsm1.getExpression() + fsm2.getExpression());
+
+        fsm1 = FSMCopier.copyFsm(fsm1);
+        fsm2 = FSMCopier.copyFsm(fsm2);
 
         State fsm2StartState = fsm2.getStartState();
         Set<State> fsm1FinalStates = fsm1.getFinalStates();
@@ -95,6 +99,7 @@ public class FSMConcatenator {
 
         if (!fsm2StartState.isFinalState) {
             for (State currentState : fsm1FinalStates) {
+                currentState.fuseStateName(fsm2StartState);
                 currentState.resetFinalState();
             }
         }

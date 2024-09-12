@@ -2,6 +2,7 @@ package geje1017.gui;
 
 import geje1017.logic.finiteStateMachine.FSMStructure;
 import geje1017.logic.postfix.ExpressionEvaluator;
+import geje1017.logic.postfix.ExpressionValidator;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -31,10 +32,15 @@ public class Controller implements ActionListener, KeyListener {
     }
 
     private void processEvent() {
-        this.frame.setupScrollPane();
-        cleanResult();
-        processInput();
-        updateGui();
+        try {
+            ExpressionValidator.validateInfix(frame.getInputFieldText());
+            this.frame.setupScrollPane();
+            cleanResult();
+            processInput();
+            updateGui();
+        } catch (ExpressionValidator.InvalidExpressionException e) {
+            frame.setErrorLabel(e.getMessage());
+        }
     }
 
     private void cleanResult() {
@@ -66,9 +72,6 @@ public class Controller implements ActionListener, KeyListener {
     private void displayElementaryFSMs(List<FSMStructure> currFsm) {
         ElementaryFSMPanel resultPanel = new ElementaryFSMPanel(currFsm);
         frame.solutionPanel.add(resultPanel);
-//        for (FSMStructure fsm : currFsm) {
-//            addResult(fsm);
-//        }
     }
 
     private void displayGroupedFSMs(List<FSMGroup> groups) {

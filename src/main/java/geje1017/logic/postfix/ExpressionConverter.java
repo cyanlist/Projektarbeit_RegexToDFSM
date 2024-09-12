@@ -5,7 +5,7 @@ import java.util.Stack;
 /**
  * This class provides methods to convert infix expressions to postfix notation using InputManager.
  */
-public class ExpressionConverter {
+public abstract class ExpressionConverter {
 
     /**
      * Converts an infix expression to a postfix expression.
@@ -13,48 +13,27 @@ public class ExpressionConverter {
      * @param infix The infix expression to be converted.
      * @return The resulting postfix expression.
      */
-    public static String infixToPostfix(String infix) {
+    public static String convertInfixToPostfix(String infix) {
 
-        // if (!ExpressionValidator.isValidInfix(infix)) throw new IllegalArgumentException("Invalid infix: " + infix);
-
-        infix = infix.replace("\\e", "ε");
-        infix = infix.replace("\\0", "Ø");
-
-        infix = infix.replaceAll("\\s+", ""); // Remove white spaces
-        infix = removeEmptyParentheses(infix);
-        System.out.println(infix + " " + infix.length());
-        infix = insertImplicitConcatenation(infix); // Insert commas where needed
-
-        StringBuilder postfix = new StringBuilder();
-        Stack<Character> stack = new Stack<>();
-
-        for (int i = 0; i < infix.length(); i++) {
-            char c = infix.charAt(i);
-
-            if (InputManager.isOperand(c)) { // Operand
-                postfix.append(c).append(' ');
-            } else if (c == InputManager.OperatorType.PARENTHESIS_OPEN.getSymbol()) { // Left parenthesis
-                stack.push(c);
-            } else if (c == InputManager.OperatorType.PARENTHESIS_CLOSE.getSymbol()) { // Right parenthesis
-                while (!stack.isEmpty() && stack.peek() != InputManager.OperatorType.PARENTHESIS_OPEN.getSymbol()) {
-                    postfix.append(stack.pop()).append(' ');
-                }
-                stack.pop(); // Remove the '(' from stack
-            } else if (InputManager.isOperator(c)) { // Operator
-                while (!stack.isEmpty()
-                        && InputManager.hasEqualOrHigherPriority(stack.peek(), c)
-                        && stack.peek() != InputManager.OperatorType.PARENTHESIS_OPEN.getSymbol()) {
-                    postfix.append(stack.pop()).append(' ');
-                }
-                stack.push(c);
-            }
-        }
-
-        while (!stack.isEmpty()) { // Clear the stack
-            postfix.append(stack.pop()).append(' ');
-        }
+        infix = prepareInfixExpression(infix);
+        String postfix = processInfixToPostfix(infix);
 
         return postfix.toString().trim();
+    }
+
+    /**
+     * Prepares the infix expression by removing whitespaces, replacing special symbols,
+     * and inserting implicit concatenation operators.
+     *
+     * @param infix The original infix expression.
+     * @return The cleaned and prepared infix expression.
+     */
+    private static String prepareInfixExpression(String infix) {
+        infix = infix.replace("\\e", "ε");
+        infix = infix.replace("\\0", "Ø");
+        infix = infix.replaceAll("\\s+", "");  // Remove white spaces
+        infix = removeEmptyParentheses(infix);
+        return insertImplicitConcatenation(infix);  // Insert commas where needed
     }
 
     /**
@@ -114,6 +93,39 @@ public class ExpressionConverter {
             expression = expression.replace("()", "");
         } while (!expression.equals(previousExpression));
         return expression;
+    }
+
+    private static String processInfixToPostfix(String infix) {
+        StringBuilder postfix = new StringBuilder();
+        Stack<Character> stack = new Stack<>();
+
+        for (int i = 0; i < infix.length(); i++) {
+            char c = infix.charAt(i);
+
+            if (InputManager.isOperand(c)) { // Operand
+                postfix.append(c).append(' ');
+            } else if (c == InputManager.OperatorType.PARENTHESIS_OPEN.getSymbol()) { // Left parenthesis
+                stack.push(c);
+            } else if (c == InputManager.OperatorType.PARENTHESIS_CLOSE.getSymbol()) { // Right parenthesis
+                while (!stack.isEmpty() && stack.peek() != InputManager.OperatorType.PARENTHESIS_OPEN.getSymbol()) {
+                    postfix.append(stack.pop()).append(' ');
+                }
+                stack.pop(); // Remove the '(' from stack
+            } else if (InputManager.isOperator(c)) { // Operator
+                while (!stack.isEmpty()
+                        && InputManager.hasEqualOrHigherPriority(stack.peek(), c)
+                        && stack.peek() != InputManager.OperatorType.PARENTHESIS_OPEN.getSymbol()) {
+                    postfix.append(stack.pop()).append(' ');
+                }
+                stack.push(c);
+            }
+        }
+
+        while (!stack.isEmpty()) {
+            postfix.append(stack.pop()).append(' ');
+        }
+
+        return postfix.toString().trim();
     }
 
 }

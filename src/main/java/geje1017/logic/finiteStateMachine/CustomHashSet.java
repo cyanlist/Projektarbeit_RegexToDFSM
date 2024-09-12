@@ -12,14 +12,15 @@ public class CustomHashSet<E> extends HashSet<E> {
     public String toString() {
         Iterator<E> it = iterator();
         if (!it.hasNext())
-            return "";
+            return "{}";
 
         StringBuilder sb = new StringBuilder();
+        sb.append('{');
         while (it.hasNext()) {
             E e = it.next();
             sb.append(e == this ? "(this Set)" : e);
             if (!it.hasNext())
-                return sb.toString();
+                return sb.append('}').toString();
             sb.append(',').append(' ');
         }
         return sb.toString();

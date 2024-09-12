@@ -19,7 +19,6 @@ public class FSMAlternator {
         if (specialCaseResult != null) {
             return specialCaseResult;
         }
-
         return performAlternation(copyFsm1, copyFsm2);
     }
 

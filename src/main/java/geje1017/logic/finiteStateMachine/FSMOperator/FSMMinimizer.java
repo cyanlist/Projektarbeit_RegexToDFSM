@@ -10,9 +10,12 @@ import static geje1017.logic.finiteStateMachine.FSMOperator.FSMCopier.copyFsm;
 public class FSMMinimizer {
 
     public static FSMStructure minimize(FSMStructure fsm) {
+
         if (fsm.getExpression().length() <= 1) {
             return fsm;
         }
+
+        fsm = FSMCopier.copyFsm(fsm);
 
         Set<State> states = fsm.getStates();
         Map<State, Map<String, State>> transitionTable = buildTransitionTable(fsm);
@@ -94,6 +97,9 @@ public class FSMMinimizer {
             State newTgt = stateMap.get(target);
             minimizedFsm.addTransition(newSrc, new HashSet<>(Collections.singletonList(symbol)), newTgt);
         }));
+
+        minimizedFsm.getStates().forEach((State::simplifyName));
+
         return minimizedFsm;
     }
 
