@@ -95,6 +95,10 @@ public class State {
         return Collections.unmodifiableList(numbers);
     }
 
+    public void setNumbers(List<Integer> numbers) {
+        this.numbers = numbers;
+    }
+
     public boolean isStartState() {
         return isStartState;
     }
@@ -128,6 +132,14 @@ public class State {
             numbers = new ArrayList<>(Collections.singletonList(uniqueName++));
             this.isNew = true;
         }
+    }
+
+    public void setStartState(boolean startState) {
+        isStartState = startState;
+    }
+
+    public void setFinalState(boolean finalState) {
+        isFinalState = finalState;
     }
 
     @Override

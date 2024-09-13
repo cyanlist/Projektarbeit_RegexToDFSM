@@ -34,9 +34,10 @@ public class ExpressionEvaluator {
                     FSMStructure operationFSM = fsm;
                     FSMStructure deterministicFSM = FSMDeterminizer.toDeterministicFsm(operationFSM);
                     FSMStructure minimizedFSM = FSMMinimizer.minimize(deterministicFSM);
-                    FSMGroup group = new FSMGroup(operationFSM, deterministicFSM, minimizedFSM);
+                    FSMStructure simplifiedFSM = FSMSimplifier.simplify(minimizedFSM);
+                    FSMGroup group = new FSMGroup(operationFSM, deterministicFSM, minimizedFSM, simplifiedFSM);
                     storage.addFSMGroup(group);
-                    stack.push(minimizedFSM);
+                    stack.push(simplifiedFSM);
                 }
             } else if (InputManager.isOperand(currentChar)) {
                 fsm = FSMSymbolConverter.convertInputCharacter(currentChar);

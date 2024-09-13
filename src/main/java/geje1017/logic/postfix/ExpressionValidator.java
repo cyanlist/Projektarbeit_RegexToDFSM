@@ -84,7 +84,7 @@ public abstract class ExpressionValidator {
                 // Prüfen auf unzulässige Positionen (nach '(' oder '|')
                 if (i > 0) {
                     char previousChar = expression.charAt(i - 1);
-                    if (previousChar == '(' || previousChar == '|') {
+                    if (previousChar == '(' || InputManager.isBinaryOperator(previousChar)) {
                         throw new InvalidExpressionException("Invalid unary operator placement after " + previousChar);
                     }
                 }
@@ -109,7 +109,7 @@ public abstract class ExpressionValidator {
             char c = expression.charAt(i);
 
             // Prüfen, ob es ein binärer Operator ist
-            if (InputManager.isOperator(c) && !InputManager.isUnaryOperator(c)) {
+            if (InputManager.isBinaryOperator(c)) {
 
                 // Überprüfen auf unzulässige Platzierungen: Doppelte '|' oder am Anfang/Ende des Ausdrucks
                 if (i == 0 || i == expression.length() - 1) {
@@ -120,8 +120,10 @@ public abstract class ExpressionValidator {
                 char previousChar = expression.charAt(i - 1);
                 char nextChar = expression.charAt(i + 1);
 
-                if (InputManager.isOperator(previousChar)
-                        || InputManager.isOperator(nextChar)) {
+                if (InputManager.isBinaryOperator(previousChar)
+                        || InputManager.isBinaryOperator(nextChar)
+                        || previousChar == InputManager.OperatorType.PARENTHESIS_OPEN.getSymbol()
+                        || nextChar == InputManager.OperatorType.PARENTHESIS_CLOSE.getSymbol()){
                     throw new InvalidExpressionException("Invalid binary operator placement near: " + c);
                 }
             }

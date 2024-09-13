@@ -31,7 +31,7 @@ public class FSMStorage {
         if (lastElement < 0) {
             return elementaryFSMs.get(0);
         }
-        return fsmGroups.get(lastElement).getMinimizedFSM();
+        return fsmGroups.get(lastElement).getSimplifiedFSM();
     }
 }
 

@@ -6,99 +6,114 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * FSMResultPanel displays the result of the FSM operations with collapsible details.
- * It inherits common functionalities from AbstractFSMPanel.
+ * FSMResultPanel zeigt das Ergebnis des FSM-Prozesses mit einer umschaltbaren Detailansicht.
+ * Es erbt gemeinsame Funktionalitäten von AbstractFSMPanel.
  */
 public class FSMResultPanel extends AbstractFSMPanel {
 
-    private boolean isCollapsed = true; // Flag to track the collapsed state
-    private final int step = stepCounter++; // Step number for tracking FSM operations
-    private int subStep = 1;
+    private boolean isCollapsed = true; // Flag zum Umschalten der Ansichten (minimiert/erweitert)
+    private int subStep = 1;            // Unterzähler für die Schritte
 
-    /**
-     * Constructor for FSMResultPanel, initializing FSMGroup and toggling details.
-     * @param fsmGroup The FSMGroup to display results for.
-     */
     public FSMResultPanel(FSMGroup fsmGroup) {
         super(fsmGroup);
-        this.toggleDetails();
+        toggleDetails();  // Initialisiert die Details (minimierte Ansicht standardmäßig)
+    }
+
+    @Override
+    protected void setupPanel() {
+        // Diese Methode kann leer bleiben, da wir die Ansicht in toggleDetails() initialisieren
     }
 
     /**
-     * Toggles between the minimized and expanded views of the FSM details.
+     * Schaltet zwischen der minimierten und der erweiterten Ansicht um.
      */
     private void toggleDetails() {
-        this.detailsPanel.removeAll();
-        if (this.isCollapsed) {
-            addMinimizedView();
+        detailsPanel.removeAll();
+
+        if (isCollapsed) {
+            addMinimizedView(); // Zeigt nur grundlegende Informationen an
         } else {
-            addExpandedView();
+            addExpandedView();  // Zeigt detaillierte FSM-Informationen an
         }
-        this.revalidate();
-        this.repaint();
+
+        revalidate();
+        repaint();
     }
 
     /**
-     * Adds a minimized view of the FSM with basic details.
+     * Fügt die minimierte Ansicht des FSM hinzu.
      */
     private void addMinimizedView() {
         GridBagConstraints gbc = createDefaultGBC();
-        this.detailsPanel.add(createToggleButton(), gbc);
-        FSMStructure fsm = fsmGroup.getMinimizedFSM();
-        this.setBorder(createTitledBorder(fsm, "Step " + step + ": " + fsm.getExpression()));
-        gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.CENTER;
-        this.detailsPanel.add(new FSMVisualizer(fsm), gbc);
+
+        // Titel und Minimierte Ansicht
+        FSMStructure fsm = fsmGroup.getSimplifiedFSM();
+        setBorder(createTitledBorder(fsm, "Minimized FSM Result"));
+        detailsPanel.add(createToggleButton(), gbc);
+
+        // Fügt die minimalisierte FSM-Darstellung hinzu
+        detailsPanel.add(new FSMVisualizer(fsm), gbc);
     }
 
     /**
-     * Adds an expanded view with detailed FSM information.
+     * Fügt die erweiterte Ansicht des FSM hinzu.
      */
     private void addExpandedView() {
         GridBagConstraints gbc = createDefaultGBC();
-        this.subStep = 1;
-        this.detailsPanel.add(createToggleButton(), gbc);
-        gbc.gridy = 0;
-        addFSMDetails(gbc, fsmGroup.getOperationFSM(), "Operation FSM" );
-        addFSMDetails(gbc, fsmGroup.getDeterministicFSM(), "Deterministic FSM" );
+        subStep = 1;  // Zähler für die Unter-Schritte
+
+        // Umschalt-Button oben hinzufügen
+        detailsPanel.add(createToggleButton(), gbc);
+
+        // FSMs (Operation, Deterministisch, Minimiert) mit Details hinzufügen
+        addFSMDetails(gbc, fsmGroup.getOperationFSM(), "Operation FSM");
+        addFSMDetails(gbc, fsmGroup.getDeterministicFSM(), "Deterministic FSM");
         addFSMDetails(gbc, fsmGroup.getMinimizedFSM(), "Minimized FSM");
+        addFSMDetails(gbc, fsmGroup.getSimplifiedFSM(), "Simplified FSM");
     }
 
     /**
-     * Creates a toggle button to switch between expanded and minimized views.
-     * @return JButton to toggle FSM details.
+     * Erstellt einen Button, um zwischen minimierter und erweiterter Ansicht umzuschalten.
+     * @return JButton, der die Ansicht umschaltet.
      */
     private JButton createToggleButton() {
         JButton toggleButton = new JButton(isCollapsed ? "Show Details" : "Hide Details");
         toggleButton.addActionListener(e -> {
-            this.isCollapsed = !isCollapsed;
-            this.toggleDetails();
+            isCollapsed = !isCollapsed;
+            toggleDetails();
         });
         return toggleButton;
     }
 
-    @Override
+    /**
+     * Fügt detaillierte FSM-Informationen zur erweiterten Ansicht hinzu.
+     * @param gbc GridBagConstraints für das Layout.
+     * @param fsm FSMStructure mit den anzuzeigenden Daten.
+     * @param description Beschreibung des FSM-Typs (z.B. "Operation FSM").
+     */
     protected void addFSMDetails(GridBagConstraints gbc, FSMStructure fsm, String description) {
         gbc.gridy++;
 
-        JTextArea step = setupTextArea(new JTextArea(this.step + "." + this.subStep++ + ": " + description));
+        // Beschreibung der FSM (Schrittzahl und Typ)
+        JTextArea step = setupTextArea(new JTextArea("Step " + subStep++ + ": " + description));
         detailsPanel.add(step, gbc);
-        gbc.gridy++;
 
+        // Visualisierung und Erklärung der FSM
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setResizeWeight(0.5);
         splitPane.setContinuousLayout(true);
         splitPane.setLeftComponent(new FSMVisualizer(fsm));
 
+        // FSM-Details (Textbereich für die Definition und Erklärung)
         JTextArea definitionArea = setupTextArea(new JTextArea(fsm.toString()));
         splitPane.setRightComponent(new JScrollPane(definitionArea));
 
         gbc.gridy++;
         detailsPanel.add(splitPane, gbc);
 
-        gbc.gridy++;
+        // Optional: Erklärung zu dem FSM hinzufügen (falls verfügbar)
         JTextArea explanationArea = setupTextArea(new JTextArea(fsm.getExplanation()));
-        detailsPanel.add(explanationArea, gbc);
         gbc.gridy++;
+        detailsPanel.add(explanationArea, gbc);
     }
 }

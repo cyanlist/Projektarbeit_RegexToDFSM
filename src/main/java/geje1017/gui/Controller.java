@@ -65,13 +65,13 @@ public class Controller implements ActionListener, KeyListener {
     }
 
     public void displayResultFSM(FSMStructure fsm) {
-        MinimizedFSMPanel resultPanel = new MinimizedFSMPanel(new FSMGroup(fsm, fsm, fsm)); // Simplified for elementary FSMs
+        MinimizedFSMPanel resultPanel = new MinimizedFSMPanel(new FSMGroup(fsm, fsm, fsm, fsm)); // Simplified for elementary FSMs
         frame.resultPanel.add(resultPanel);
     }
 
     private void displayElementaryFSMs(List<FSMStructure> currFsm) {
-        ElementaryFSMPanel resultPanel = new ElementaryFSMPanel(currFsm);
-        frame.solutionPanel.add(resultPanel);
+        /*ElementaryFSMPanel resultPanel = new ElementaryFSMPanel(currFsm);
+        frame.solutionPanel.add(resultPanel);*/
     }
 
     private void displayGroupedFSMs(List<FSMGroup> groups) {
@@ -81,7 +81,7 @@ public class Controller implements ActionListener, KeyListener {
     }
 
     private void addResult(FSMStructure fsm) {
-        FSMResultPanel resultPanel = new FSMResultPanel(new FSMGroup(fsm, fsm, fsm)); // Simplified for elementary FSMs
+        FSMResultPanel resultPanel = new FSMResultPanel(new FSMGroup(fsm, fsm, fsm, fsm)); // Simplified for elementary FSMs
         frame.solutionPanel.add(resultPanel);
     }
 

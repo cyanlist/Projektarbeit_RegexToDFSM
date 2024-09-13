@@ -22,7 +22,8 @@ public class FSMStructure {
         this.transitions = new TreeMap<>(Comparator
                 .comparing(State::isStartState, Comparator.reverseOrder())
                 .thenComparing(State::getFirstNumber)
-                .thenComparing(State::toString));
+                .thenComparing(State::toString)
+                .thenComparing(State::isFinalState, Comparator.reverseOrder()));
     }
 
     /**

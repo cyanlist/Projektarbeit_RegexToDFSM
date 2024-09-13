@@ -41,12 +41,22 @@ public class Frame extends JFrame {
         this.setMinimumSize(MIN_SIZE);
         this.setPreferredSize(PREF_SIZE);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(800, 400);
         this.setLocationRelativeTo(null);
         this.mainPanel = new JPanel(new GridBagLayout());
         add(this.mainPanel);
 
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int screenWidth = screenSize.width;
+        int screenHeight = screenSize.height;
+        // Berechne 80% der Bildschirmgröße
+        int windowWidth = (int) (screenWidth * 0.8);
+        int windowHeight = (int) (screenHeight * 0.8);
+        setSize(windowWidth, windowHeight);
+
         margin = this.getWidth() / 8;
+
+        this.setLocationRelativeTo(null);
+        this.setResizable(false);
     }
 
     private void initializeComponents() {

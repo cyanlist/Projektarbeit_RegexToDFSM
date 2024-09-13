@@ -5,228 +5,138 @@ import geje1017.logic.finiteStateMachine.State;
 
 import java.util.*;
 
-import static geje1017.logic.finiteStateMachine.FSMOperator.FSMCopier.copyFsm;
-
 public class FSMMinimizer {
 
+    // (ab)|(cb)
+
     public static FSMStructure minimize(FSMStructure fsm) {
+        // Schritt 1: Initiale Partitionierung der Zustände in Final- und Nicht-Finalzustände
+        Set<State> finalStates = fsm.getFinalStates();
+        Set<State> nonFinalStates = new HashSet<>(fsm.getStates());
+        nonFinalStates.removeAll(finalStates);
 
-        if (fsm.getExpression().length() <= 1) {
-            return fsm;
-        }
-
-        fsm = FSMCopier.copyFsm(fsm);
-
-        Set<State> states = fsm.getStates();
-        Map<State, Map<String, State>> transitionTable = buildTransitionTable(fsm);
-
-        Set<Set<State>> partitions = initializePartitions(states);
-        partitions = refinePartitions(partitions, transitionTable);
-
-        return buildMinimizedFsm(partitions, transitionTable, fsm.getExpression());
-    }
-
-    private static Map<State, Map<String, State>> buildTransitionTable(FSMStructure fsm) {
-        Map<State, Map<String, State>> table = new HashMap<>();
-        fsm.getTransitions().forEach((src, tgtMap) -> tgtMap.forEach(
-                (tgt, symbols) -> symbols.forEach(symbol -> table
-                        .computeIfAbsent(src, k -> new HashMap<>())
-                        .put(symbol, tgt))));
-        return table;
-    }
-
-    private static Set<Set<State>> initializePartitions(Set<State> states) {
-        Set<State> finalStates = new HashSet<>();
-        Set<State> nonFinalStates = new HashSet<>();
-        for (State state : states) {
-            if (state.isFinalState()) finalStates.add(state);
-            else nonFinalStates.add(state);
-        }
-        Set<Set<State>> partitions = new HashSet<>();
+        // Initiale Partitionen: Finalzustände und Nicht-Finalzustände
+        List<Set<State>> partitions = new ArrayList<>();
         if (!finalStates.isEmpty()) partitions.add(finalStates);
         if (!nonFinalStates.isEmpty()) partitions.add(nonFinalStates);
-        return partitions;
-    }
 
-    private static Set<Set<State>> refinePartitions(Set<Set<State>> partitions, Map<State, Map<String, State>> transitionTable) {
-        boolean wasRefined;
+        System.out.println("Initiale Partitionen: " + partitions);
+
+        // Schritt 2: Paarweises Vergleichen und Verfeinerung der Partitionen
+        boolean changed;
         do {
-            wasRefined = false;
-            Set<Set<State>> newPartitions = new HashSet<>();
+            changed = false;
+            List<Set<State>> newPartitions = new ArrayList<>();
+
+            // Durchlaufe jede Partition
             for (Set<State> partition : partitions) {
-                Set<Set<State>> refinedPartition = refinePartition(partition, partitions, transitionTable);
-                newPartitions.addAll(refinedPartition);
-                wasRefined |= refinedPartition.size() > 1;
+                // Map für die Verfeinerung basierend auf Signaturen
+                Map<String, Set<State>> split = new HashMap<>();
+
+                // Erstelle die Signatur für jeden Zustand in der Partition
+                for (State state : partition) {
+                    String signature = getSignature(state, fsm, partitions);  // Signatur als String
+                    split.computeIfAbsent(signature, k -> new HashSet<>()).add(state);
+                }
+
+                // Neue Partitionen basierend auf den Signaturen
+                newPartitions.addAll(split.values());
+
+                // Wenn die Partition aufgeteilt wurde, setze "changed" auf true
+                if (split.size() > 1) {
+                    changed = true;
+                }
             }
+
             partitions = newPartitions;
-        } while (wasRefined);
-        return partitions;
+            System.out.println("Aktualisierte Partitionen nach Verfeinerung: " + partitions);
+
+        } while (changed);
+
+        // Schritt 3: Erzeuge den minimierten Automaten
+        return buildMinimizedFsm(partitions, fsm);
     }
 
-    private static Set<Set<State>> refinePartition(Set<State> partition, Set<Set<State>> partitions, Map<State, Map<String, State>> transitionTable) {
-        Map<Map<String, Set<State>>, Set<State>> signatureToStates = new HashMap<>();
-        partition.forEach(state -> {
-            Map<String, Set<State>> signature = createSignature(state, partitions, transitionTable);
-            signatureToStates.computeIfAbsent(signature, k -> new HashSet<>()).add(state);
-        });
-        return new HashSet<>(signatureToStates.values());
+
+    // Erzeuge eine Signatur eines Zustands basierend auf den Übergängen und Zielzuständen
+    private static String getSignature(State state, FSMStructure fsm, List<Set<State>> partitions) {
+        StringBuilder signature = new StringBuilder();
+        Map<State, Set<String>> transitions = fsm.getTargetStatesAndSymbols(state);
+
+        // Durchlaufe alle Übergänge des Zustands
+        for (Map.Entry<State, Set<String>> entry : transitions.entrySet()) {
+            State target = entry.getKey();
+            Set<String> symbols = entry.getValue();
+
+            // Finde die Partition, in der der Zielzustand liegt
+            for (Set<State> partition : partitions) {
+                if (partition.contains(target)) {
+                    // Verwende die Partition selbst als Teil der Signatur
+                    signature.append("Symbol: ").append(symbols).append(" -> Partition: ").append(partition.hashCode()).append(";");
+                    break;
+                }
+            }
+        }
+
+        // Füge eine Kennzeichnung für Final-/Nicht-Finalzustände hinzu
+        if (state.isFinalState()) {
+            signature.append("Final;");
+        } else {
+            signature.append("NonFinal;");
+        }
+
+        // Rückgabe der Signatur als String
+        return signature.toString();
     }
 
-    private static Map<String, Set<State>> createSignature(State state, Set<Set<State>> partitions, Map<State, Map<String, State>> transitionTable) {
-        Map<String, Set<State>> signature = new HashMap<>();
-        Map<String, State> stateTransitions = transitionTable.getOrDefault(state, Collections.emptyMap());
 
-        stateTransitions.forEach((symbol, target) -> {
-            partitions.stream()
-                    .filter(p -> p.contains(target))
-                    .findFirst()
-                    .ifPresent(p -> {
-                        signature.computeIfAbsent(symbol, k -> new HashSet<>()).add(target);
-                    });
-        });
-        return signature;
-    }
 
-    private static FSMStructure buildMinimizedFsm(Set<Set<State>> partitions, Map<State, Map<String, State>> transitionTable, String expression) {
+
+    // Baut den minimierten Automaten basierend auf den verfeinerten Partitionen
+    private static FSMStructure buildMinimizedFsm(List<Set<State>> partitions, FSMStructure fsm) {
         FSMStructure minimizedFsm = new FSMStructure();
-        minimizedFsm.setExpression(expression);
-        Map<State, State> stateMap = mapStatesToRepresentatives(partitions, minimizedFsm);
 
-        transitionTable.forEach((original, transitions) -> transitions.forEach((symbol, target) -> {
-            State newSrc = stateMap.get(original);
-            State newTgt = stateMap.get(target);
-            minimizedFsm.addTransition(newSrc, new HashSet<>(Collections.singletonList(symbol)), newTgt);
-        }));
+        // Erstelle eine Repräsentation für jeden Zustand in der Partition
+        Map<State, State> representativeMap = new HashMap<>();
+        for (Set<State> partition : partitions) {
+            State representative = State.fuseState(partition); // Füge die Zustände zusammen
+            for (State state : partition) {
+                representativeMap.put(state, representative);
+            }
+            minimizedFsm.addTransition(representative, null, null);
+        }
 
-        minimizedFsm.getStates().forEach((State::simplifyName));
+        // Füge die Übergänge für den minimierten Automaten hinzu
+        for (Map.Entry<State, Map<State, Set<String>>> entry : fsm.getTransitions().entrySet()) {
+            State originalState = entry.getKey();
+            State representative = representativeMap.get(originalState);
+
+            for (Map.Entry<State, Set<String>> transition : entry.getValue().entrySet()) {
+                State target = transition.getKey();
+                State targetRepresentative = representativeMap.get(target);
+
+                minimizedFsm.addTransition(representative, transition.getValue(), targetRepresentative);
+            }
+        }
+
+        // Setze die Startzustände des minimierten Automaten
+        Set<State> startStates = fsm.getStartStates();
+        for (State startState : startStates) {
+            State representative = representativeMap.get(startState);
+            if (representative != null) {
+                representative.setStartState(true);
+            }
+        }
+
+        // Setze die Finalzustände des minimierten Automaten
+        Set<State> finalStates = fsm.getFinalStates();
+        for (State finalState : finalStates) {
+            State representative = representativeMap.get(finalState);
+            if (representative != null) {
+                representative.setFinalState(true);
+            }
+        }
 
         return minimizedFsm;
     }
-
-    private static Map<State, State> mapStatesToRepresentatives(Set<Set<State>> partitions, FSMStructure minimizedFsm) {
-        Map<State, State> stateMap = new HashMap<>();
-        partitions.forEach(partition -> {
-            State representative = State.fuseState(partition);
-            partition.forEach(state -> {
-                stateMap.put(state, representative);
-                minimizedFsm.getTransitions().putIfAbsent(representative, new HashMap<>());
-            });
-        });
-        return stateMap;
-    }
 }
-
-//public class FSMMinimizer{
-//
-//    /**
-//     * Minimizes a deterministic FSM by merging equivalent states.
-//     * This method first ensures that the provided FSM is deterministic,
-//     * then identifies reachable states, forms equivalence classes of states,
-//     * and finally merges states within the same equivalence class.
-//     *
-//     * @param fsm The deterministic FSM to minimize.
-//     * @return The minimized FSM.
-//     */
-//    public static FSMStructure minimize(FSMStructure fsm) {
-//
-//        fsm = copyFsm(fsm);
-//        FSMStructure minimizedFsm;
-//
-//        if (fsm.getExpression().length() <= 1)  {
-//            return fsm;
-//        }
-//
-//        Set<State> states = fsm.getStates();
-//        Map<State, Map<String, State>> transitionTable = buildTransitionTable(fsm);
-//
-//        // Initialize partitions: Final and non-final states
-//        Set<Set<State>> partitions = new HashSet<>();
-//        Set<State> finalStates = new HashSet<>();
-//        Set<State> nonFinalStates = new HashSet<>();
-//
-//        for (State state : states) {
-//            if (state.isFinalState()) {
-//                finalStates.add(state);
-//            } else {
-//                nonFinalStates.add(state);
-//            }
-//        }
-//
-//        if (!finalStates.isEmpty()) partitions.add(finalStates);
-//        if (!nonFinalStates.isEmpty()) partitions.add(nonFinalStates);
-//
-//        // Refine partitions
-//        boolean wasRefined;
-//        do {
-//            wasRefined = false;
-//            Set<Set<State>> newPartitions = new HashSet<>();
-//
-//            for (Set<State> partition : partitions) {
-//                Set<Set<State>> refinedPartition = refinePartition(partition, partitions, transitionTable);
-//                newPartitions.addAll(refinedPartition);
-//                if (refinedPartition.size() > 1) wasRefined = true;
-//            }
-//
-//            partitions = newPartitions;
-//        } while (wasRefined);
-//
-//        // Build the minimized FSM from partitions
-//        minimizedFsm = buildMinimizedFsm(partitions, transitionTable);
-//        minimizedFsm.setExpression(fsm.getExpression());
-//        minimizedFsm.foo = "Minimized: ";
-//
-//        return minimizedFsm;
-//    }
-//
-//    private static Map<State, Map<String, State>> buildTransitionTable(FSMStructure fsm) {
-//        Map<State, Map<String, State>> table = new HashMap<>();
-//        fsm.getTransitions().forEach((src, tgtMap) -> {
-//            Map<String, State> transitionMap = new HashMap<>();
-//            tgtMap.forEach((tgt, symbols) -> symbols.forEach(symbol -> transitionMap.put(symbol, tgt)));
-//            table.put(src, transitionMap);
-//        });
-//        return table;
-//    }
-//
-//    private static Set<Set<State>> refinePartition(Set<State> partition, Set<Set<State>> partitions, Map<State, Map<String, State>> transitionTable) {
-//        Map<Map<String, Set<State>>, Set<State>> signatureToStates = new HashMap<>();
-//
-//        for (State state : partition) {
-//            Map<String, Set<State>> signature = new HashMap<>();
-//            transitionTable.get(state).forEach((symbol, target) -> partitions.forEach(p -> {
-//                if (p.contains(target)) {
-//                    signature.putIfAbsent(symbol, new HashSet<>());
-//                    signature.get(symbol).add(target);
-//                }
-//            }));
-//            signatureToStates.putIfAbsent(signature, new HashSet<>());
-//            signatureToStates.get(signature).add(state);
-//        }
-//
-//        return new HashSet<>(signatureToStates.values());
-//    }
-//
-//    private static FSMStructure buildMinimizedFsm(Set<Set<State>> partitions, Map<State, Map<String, State>> transitionTable) {
-//        FSMStructure minimizedFsm = new FSMStructure();
-//        Map<State, State> stateMap = new HashMap<>();
-//
-//        // Create a representative state for each partition
-//        for (Set<State> partition : partitions) {
-//            State representative = State.fuseState(partition);
-//            partition.forEach(state -> stateMap.put(state, representative));
-//            minimizedFsm.getTransitions().putIfAbsent(representative, new HashMap<>());
-//        }
-//
-//        // Add transitions for the minimized FSM
-//        for (State original : transitionTable.keySet()) {
-//            State newSrc = stateMap.get(original);
-//            transitionTable.get(original).forEach((symbol, target) -> {
-//                State newTgt = stateMap.get(target);
-//                minimizedFsm.addTransition(newSrc, new HashSet<>(Collections.singletonList(symbol)), newTgt);
-//            });
-//        }
-//
-//        return minimizedFsm;
-//    }
-//
-//}

@@ -100,6 +100,11 @@ public class InputManager {
                 || c == OperatorType.POSITIVE_CLOSURE.getSymbol();
     }
 
+    public static boolean isBinaryOperator(char c) {
+        return c == OperatorType.ALTERNATION.getSymbol()
+                || c == OperatorType.CONCATENATION.getSymbol();
+    }
+
     /**
      * Retrieves the priority of an operator character.
      *

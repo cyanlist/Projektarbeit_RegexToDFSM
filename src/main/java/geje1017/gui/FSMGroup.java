@@ -7,12 +7,14 @@ public class FSMGroup {
     private final FSMStructure operationFSM;
     private final FSMStructure deterministicFSM;
     private final FSMStructure minimizedFSM;
+    private final FSMStructure simplifiedFSM;
 
     // Konstruktor und Getter
-    public FSMGroup(FSMStructure op, FSMStructure det, FSMStructure min) {
+    public FSMGroup(FSMStructure op, FSMStructure det, FSMStructure min, FSMStructure simple) {
         this.operationFSM = op;
         this.deterministicFSM = det;
         this.minimizedFSM = min;
+        this.simplifiedFSM = simple;
     }
 
     public FSMStructure getOperationFSM() {
@@ -25,5 +27,9 @@ public class FSMGroup {
 
     public FSMStructure getMinimizedFSM() {
         return minimizedFSM;
+    }
+
+    public FSMStructure getSimplifiedFSM() {
+        return simplifiedFSM;
     }
 }
