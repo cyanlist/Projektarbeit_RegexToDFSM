@@ -9,13 +9,17 @@ public class MinimizedFSMPanel extends AbstractFSMPanel {
 
     public MinimizedFSMPanel(FSMGroup fsmGroup) {
         super(fsmGroup);
+        resetStep();
     }
 
     @Override
     protected void setupPanel() {
         GridBagConstraints gbc = createDefaultGBC();
-        this.setBorder(createTitledBorder(fsmGroup.getSimplifiedFSM(), "Final result"));
-        addFSMDetails(gbc, fsmGroup.getSimplifiedFSM(), "");
+
+        FSMStructure result = fsmGroup.getSimplifiedFSM();
+
+        this.setBorder(createTitledBorder(result, "Final result: " + result.getExpression()));
+        addFSMDetails(gbc, result, "");
     }
 
     // Fügt die Details des FSM hinzu
@@ -23,7 +27,7 @@ public class MinimizedFSMPanel extends AbstractFSMPanel {
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setResizeWeight(0.5);
         splitPane.setContinuousLayout(true);
-        splitPane.setLeftComponent(new FSMVisualizer(fsm));
+        splitPane.setLeftComponent(new FSMVisualizer(FSMCopier.copyFsm(fsm)));
 
         JTextArea definitionArea = setupTextArea(new JTextArea(fsm.toString()));
         splitPane.setRightComponent(new JScrollPane(definitionArea));

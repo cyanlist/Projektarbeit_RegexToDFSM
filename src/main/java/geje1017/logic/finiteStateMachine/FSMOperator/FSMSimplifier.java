@@ -14,9 +14,6 @@ public class FSMSimplifier {
         for (State currstate : copyFsm.getStates()) {
             currstate.simplifyName();
         }
-
-        copyFsm = copyFsm(copyFsm);
-
         return copyFsm;
     }
 

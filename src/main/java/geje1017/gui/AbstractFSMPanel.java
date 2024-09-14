@@ -11,6 +11,8 @@ public abstract class AbstractFSMPanel extends JPanel {
     protected FSMGroup fsmGroup;
     protected JPanel detailsPanel;
 
+    protected static int step = 0;
+
     public AbstractFSMPanel(FSMGroup fsmGroup) {
         this.fsmGroup = fsmGroup;
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -49,5 +51,14 @@ public abstract class AbstractFSMPanel extends JPanel {
         textArea.setEditable(false);
         textArea.setBorder(null);
         return textArea;
+    }
+
+    protected void resetStep() {
+        step = 1;
+    }
+
+    protected int getStep() {
+        step++;
+        return step;
     }
 }

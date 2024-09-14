@@ -48,7 +48,7 @@ public class Frame extends JFrame {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int screenWidth = screenSize.width;
         int screenHeight = screenSize.height;
-        // Berechne 80% der Bildschirmgröße
+
         int windowWidth = (int) (screenWidth * 0.8);
         int windowHeight = (int) (screenHeight * 0.8);
         setSize(windowWidth, windowHeight);

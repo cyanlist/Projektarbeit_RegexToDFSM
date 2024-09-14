@@ -7,22 +7,18 @@ import java.util.*;
 
 public class FSMMinimizer {
 
-    // (ab)|(cb)
-
     public static FSMStructure minimize(FSMStructure fsm) {
-        // Schritt 1: Initiale Partitionierung der Zustände in Final- und Nicht-Finalzustände
+
+        fsm = FSMCopier.copyFsm(fsm);
+
         Set<State> finalStates = fsm.getFinalStates();
         Set<State> nonFinalStates = new HashSet<>(fsm.getStates());
         nonFinalStates.removeAll(finalStates);
 
-        // Initiale Partitionen: Finalzustände und Nicht-Finalzustände
         List<Set<State>> partitions = new ArrayList<>();
         if (!finalStates.isEmpty()) partitions.add(finalStates);
         if (!nonFinalStates.isEmpty()) partitions.add(nonFinalStates);
 
-        System.out.println("Initiale Partitionen: " + partitions);
-
-        // Schritt 2: Paarweises Vergleichen und Verfeinerung der Partitionen
         boolean changed;
         do {
             changed = false;
@@ -49,16 +45,12 @@ public class FSMMinimizer {
             }
 
             partitions = newPartitions;
-            System.out.println("Aktualisierte Partitionen nach Verfeinerung: " + partitions);
 
         } while (changed);
 
-        // Schritt 3: Erzeuge den minimierten Automaten
         return buildMinimizedFsm(partitions, fsm);
     }
 
-
-    // Erzeuge eine Signatur eines Zustands basierend auf den Übergängen und Zielzuständen
     private static String getSignature(State state, FSMStructure fsm, List<Set<State>> partitions) {
         StringBuilder signature = new StringBuilder();
         Map<State, Set<String>> transitions = fsm.getTargetStatesAndSymbols(state);
@@ -78,14 +70,12 @@ public class FSMMinimizer {
             }
         }
 
-        // Füge eine Kennzeichnung für Final-/Nicht-Finalzustände hinzu
         if (state.isFinalState()) {
             signature.append("Final;");
         } else {
             signature.append("NonFinal;");
         }
 
-        // Rückgabe der Signatur als String
         return signature.toString();
     }
 
@@ -95,6 +85,7 @@ public class FSMMinimizer {
     // Baut den minimierten Automaten basierend auf den verfeinerten Partitionen
     private static FSMStructure buildMinimizedFsm(List<Set<State>> partitions, FSMStructure fsm) {
         FSMStructure minimizedFsm = new FSMStructure();
+        minimizedFsm.setExpression(fsm.getExpression());
 
         // Erstelle eine Repräsentation für jeden Zustand in der Partition
         Map<State, State> representativeMap = new HashMap<>();

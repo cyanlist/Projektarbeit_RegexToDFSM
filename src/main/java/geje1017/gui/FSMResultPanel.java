@@ -11,12 +11,14 @@ import java.awt.*;
  */
 public class FSMResultPanel extends AbstractFSMPanel {
 
-    private boolean isCollapsed = true; // Flag zum Umschalten der Ansichten (minimiert/erweitert)
-    private int subStep = 1;            // Unterzähler für die Schritte
+    private boolean isCollapsed = true;
+    private int subStep = 1;
+    private int ownStep;
 
     public FSMResultPanel(FSMGroup fsmGroup) {
         super(fsmGroup);
-        toggleDetails();  // Initialisiert die Details (minimierte Ansicht standardmäßig)
+        ownStep = getStep();
+        toggleDetails();
     }
 
     @Override
@@ -46,12 +48,11 @@ public class FSMResultPanel extends AbstractFSMPanel {
     private void addMinimizedView() {
         GridBagConstraints gbc = createDefaultGBC();
 
-        // Titel und Minimierte Ansicht
         FSMStructure fsm = fsmGroup.getSimplifiedFSM();
-        setBorder(createTitledBorder(fsm, "Minimized FSM Result"));
+        setBorder(createTitledBorder(fsm, ownStep + ") " +  fsm.getExpression()));
         detailsPanel.add(createToggleButton(), gbc);
+        gbc.fill = GridBagConstraints.CENTER;
 
-        // Fügt die minimalisierte FSM-Darstellung hinzu
         detailsPanel.add(new FSMVisualizer(fsm), gbc);
     }
 
@@ -60,10 +61,11 @@ public class FSMResultPanel extends AbstractFSMPanel {
      */
     private void addExpandedView() {
         GridBagConstraints gbc = createDefaultGBC();
-        subStep = 1;  // Zähler für die Unter-Schritte
+        subStep = 1;
 
         // Umschalt-Button oben hinzufügen
         detailsPanel.add(createToggleButton(), gbc);
+        gbc.gridy++;
 
         // FSMs (Operation, Deterministisch, Minimiert) mit Details hinzufügen
         addFSMDetails(gbc, fsmGroup.getOperationFSM(), "Operation FSM");
@@ -95,7 +97,7 @@ public class FSMResultPanel extends AbstractFSMPanel {
         gbc.gridy++;
 
         // Beschreibung der FSM (Schrittzahl und Typ)
-        JTextArea step = setupTextArea(new JTextArea("Step " + subStep++ + ": " + description));
+        JTextArea step = setupTextArea(new JTextArea(subStep++ + ") " + description));
         detailsPanel.add(step, gbc);
 
         // Visualisierung und Erklärung der FSM
