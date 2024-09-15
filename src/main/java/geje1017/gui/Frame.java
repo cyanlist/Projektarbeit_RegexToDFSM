@@ -1,11 +1,16 @@
 package geje1017.gui;
 
-import com.formdev.flatlaf.FlatLightLaf;
+import geje1017.gui.customGuiElements.TextFieldWithPlaceholder;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * Represents the main window of the application, providing the user interface
+ * for inputting regular expressions and displaying the resulting FSMs. It sets up the layout, components,
+ * and event listeners, as well as handles interactions between the GUI and the application logic.
+ */
 public class Frame extends JFrame {
 
     private static final String DEFAULT_REGEX = "i.e.: (a|1+)z*";
@@ -29,6 +34,9 @@ public class Frame extends JFrame {
     private JScrollPane scrollPane;
     private JButton toggleSolutionButton;
 
+    /**
+     * Constructs a new {@code Frame} and initializes the window, its components, and layout.
+     */
     public Frame() {
         this.initializeFrame();
         this.initializeComponents();
@@ -37,6 +45,9 @@ public class Frame extends JFrame {
         this.setVisible(true);
     }
 
+    /**
+     * Initializes the frame's basic properties, such as size, location, and layout.
+     */
     private void initializeFrame() {
         this.setMinimumSize(MIN_SIZE);
         this.setPreferredSize(PREF_SIZE);
@@ -59,6 +70,9 @@ public class Frame extends JFrame {
         this.setResizable(false);
     }
 
+    /**
+     * Initializes the components used in the frame, including input fields, buttons, labels, and panels.
+     */
     private void initializeComponents() {
         this.inputPanel = new JPanel(new GridBagLayout());
         this.textField = new TextFieldWithPlaceholder(DEFAULT_REGEX, this);
@@ -73,6 +87,10 @@ public class Frame extends JFrame {
         setupScrollPane();
     }
 
+    /**
+     * Sets up the scroll pane based on whether the input field contains text.
+     * If the input field is empty, it shows a blank panel.
+     */
     public void setupScrollPane() {
         if (!textField.getText().trim().isEmpty()) {
 
@@ -102,14 +120,14 @@ public class Frame extends JFrame {
             this.scrollPane.setViewportView(scrollContent);
         }
 
-
-
-        System.out.println("scrollPane: " + scrollPane.getWidth());
         this.scrollPane.setBorder(new EmptyBorder(0, margin, 20, margin));
         TRY = scrollPane.getSize();
         System.out.println("Try: " + TRY.width);
     }
 
+    /**
+     * Lays out the components in the frame, using {@link GridBagLayout} for positioning.
+     */
     private void layoutComponents() {
         GridBagConstraints inputGbc = new GridBagConstraints();
         inputGbc.insets = new Insets(0, 5, 0, 5);
@@ -166,6 +184,9 @@ public class Frame extends JFrame {
         this.textField.setPreferredSize(new Dimension(this.textField.getPreferredSize().width, buttonSize.height));
     }
 
+    /**
+     * Configures the scroll behavior for the result and solution panels, adjusting the scroll speed and visibility settings.
+     */
     private void configureScrollBehavior() {
         this.scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         this.scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -174,6 +195,9 @@ public class Frame extends JFrame {
         verticalScrollBar.setBlockIncrement(45);
     }
 
+    /**
+     * Toggles the visibility of the solution panel and updates the button text accordingly.
+     */
     private void toggleSolutionPath() {
         boolean isSolutionVisible = solutionPanel.isVisible();
         this.solutionPanel.setVisible(!isSolutionVisible);
@@ -181,6 +205,8 @@ public class Frame extends JFrame {
         revalidate();
         repaint();
     }
+
+    // Getter and setter methods
 
     public void setErrorLabel(String message) {
         errorLabel.setText(message);

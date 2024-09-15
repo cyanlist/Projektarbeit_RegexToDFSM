@@ -1,5 +1,6 @@
-package geje1017.gui;
+package geje1017.gui.customGuiElements;
 
+import geje1017.gui.Frame;
 import geje1017.logic.finiteStateMachine.FSMStructure;
 import geje1017.logic.finiteStateMachine.State;
 
@@ -11,12 +12,14 @@ import java.util.List;
 
 /**
  * Visualizes a finite state machine (FSM) by rendering its states and transitions.
+ * Each state is represented as an oval, and transitions between states are depicted as arrows.
+ * The FSM structure is laid out dynamically, and states can be styled based on their properties.
  */
 public class FSMVisualizer extends JPanel {
 
     private final int OVAL_SIZE_MIN = 50;
 
-    private int ovalSize;  // OVAL_SIZE ist jetzt eine Instanzvariable
+    private final int ovalSize;
     private final FSMStructure fsm;
     private final Map<State, Point> statePositions;
     private StateRepresentation stateRepresentation;
@@ -24,18 +27,35 @@ public class FSMVisualizer extends JPanel {
 
     /**
      * Constructs a visualizer for the given FSM structure.
+     * Initializes the FSM, calculates the oval size, and computes state positions.
      *
      * @param fsm The FSM structure to visualize.
      */
     public FSMVisualizer(FSMStructure fsm) {
         this.fsm = fsm;
+        this.ovalSize = calculateOvalSize();
         this.statePositions = calculatePositions();
     }
 
     /**
-     * Calculates positions for each state, laying them out in a grid dynamically.
+     * Calculates the appropriate size for the ovals representing states based on
+     * the number of states and available canvas space.
      *
-     * @return A map associating each state with a specific point on the canvas.
+     * @return The calculated size for the state ovals.
+     */
+    private int calculateOvalSize() {
+        int availableWidth = Frame.TRY.width / 3;
+        int cols = (int) Math.ceil(Math.sqrt(fsm.getStates().size()));
+        int calculatedSize = availableWidth / (cols * 2 + 1);
+
+        return Math.max(calculatedSize, OVAL_SIZE_MIN);
+    }
+
+    /**
+     * Calculates the positions of each state on the canvas. States are laid out
+     * in a grid dynamically, with their positions calculated based on the oval size.
+     *
+     * @return A map associating each state with a specific position (Point) on the canvas.
      */
     private Map<State, Point> calculatePositions() {
         List<State> states = new ArrayList<>(fsm.getStates());
@@ -43,23 +63,16 @@ public class FSMVisualizer extends JPanel {
         int cols = (int) Math.ceil(Math.sqrt(states.size()));
         int rows = (int) Math.ceil((double) states.size() / cols);
 
-        int availableWidth = Frame.TRY.width / 3;
-        this.ovalSize = availableWidth / (cols * 2 + 1);
-
-        if (this.ovalSize < OVAL_SIZE_MIN) {
-            this.ovalSize = OVAL_SIZE_MIN;
-        }
-
-        int cellWidth = this.ovalSize * 2;
-        int cellHeight = this.ovalSize * 2;
+        int cellWidth = ovalSize * 2;
+        int cellHeight = ovalSize * 2;
 
         Map<State, Point> positions = new HashMap<>();
 
         for (int i = 0; i < states.size(); i++) {
             int col = i % cols;
             int row = i / cols;
-            int x = col * cellWidth + this.ovalSize;
-            int y = row * cellHeight + this.ovalSize;
+            int x = col * cellWidth + ovalSize;
+            int y = row * cellHeight + ovalSize;
             positions.put(states.get(i), new Point(x, y));
         }
 
@@ -80,17 +93,16 @@ public class FSMVisualizer extends JPanel {
         this.stateRepresentation = new StateRepresentation(g2, ovalSize);
         this.transitionRepresentation = new TransitionRepresentation(g2, ovalSize);
 
-        statePositions.forEach((state, position) -> stateRepresentation.draw(state, position, fsm));
+        statePositions.forEach((state, position) -> stateRepresentation.draw(state, position));
 
-        fsm.getTransitions().forEach((source, targets) -> {
-            targets.forEach((target, symbols) -> {
-                transitionRepresentation.draw(statePositions.get(source), statePositions.get(target), symbols);
-            });
-        });
+        fsm.getTransitions().forEach((source, targets) -> targets.forEach((target, symbols) -> {
+            transitionRepresentation.draw(statePositions.get(source), statePositions.get(target), symbols);
+        }));
     }
 
     /**
-     * Handles the visual representation of a state.
+     * Handles the visual representation of a state, including drawing its oval,
+     * label (state name), and any additional markers for final or start states.
      */
     private static class StateRepresentation {
 
@@ -98,8 +110,10 @@ public class FSMVisualizer extends JPanel {
         private final Graphics2D g2;
 
         /**
-         * Constructor to initialize the state representation with a specific oval size.
-         * @param ovalSize The size of the state oval.
+         * Initializes the state representation with the specified oval size and graphics context.
+         *
+         * @param g2       The graphics context used for drawing.
+         * @param ovalSize The size of the oval representing the state.
          */
         public StateRepresentation (Graphics2D g2, int ovalSize) {
             this.ovalSize = ovalSize;
@@ -108,12 +122,12 @@ public class FSMVisualizer extends JPanel {
 
         /**
          * Draws a state at the specified position on the canvas.
+         * The state is drawn as an oval, with different styles for new, final, and start states.
          *
-         * @param state   The state to draw.
-         * @param position The position where the state should be drawn.
-         * @param fsm     The FSM structure to which the state belongs.
+         * @param state    The state to draw.
+         * @param position The position on the canvas where the state should be drawn.
          */
-        public void draw(State state, Point position, FSMStructure fsm) {
+        public void draw(State state, Point position) {
             g2.setColor(state.isNew() ? Color.RED : Color.BLACK);
             g2.drawOval(position.x - ovalSize / 2, position.y - ovalSize / 2, ovalSize, ovalSize);
             drawStateLabel(state, position);
@@ -128,9 +142,9 @@ public class FSMVisualizer extends JPanel {
         }
 
         /**
-         * Draws a smaller inner oval for final states.
+         * Draws a smaller inner oval to indicate that the state is a final state.
          *
-         * @param position The position of the state.
+         * @param position The position of the state on the canvas.
          */
         private void drawInnerOval(Point position) {
             int innerOvalSize = (int) (ovalSize * 0.8);
@@ -140,8 +154,8 @@ public class FSMVisualizer extends JPanel {
         /**
          * Draws the label (state name) inside the oval.
          *
-         * @param state   The state whose name will be displayed.
-         * @param position The position where the label should be drawn.
+         * @param state    The state whose name will be displayed.
+         * @param position The position on the canvas where the label should be drawn.
          */
         private void drawStateLabel(State state, Point position) {
             String stateName = state.toString();
@@ -158,7 +172,9 @@ public class FSMVisualizer extends JPanel {
     }
 
     /**
-     * Handles the visual representation of a transition between states.
+     * Handles the visual representation of transitions between states.
+     * Transitions can be drawn as straight arrows, curved arrows, or loops, depending
+     * on the relationship between the states.
      */
     private static class TransitionRepresentation {
 
@@ -166,8 +182,10 @@ public class FSMVisualizer extends JPanel {
         private final Graphics2D g2;
 
         /**
-         * Constructor to initialize the transition representation with a specific oval size.
-         * @param ovalSize The size of the state ovals.
+         * Initializes the transition representation with the specified oval size and graphics context.
+         *
+         * @param g2       The graphics context used for drawing.
+         * @param ovalSize The size of the ovals representing the states.
          */
         public TransitionRepresentation (Graphics2D g2, int ovalSize) {
             this.ovalSize = ovalSize;
@@ -175,26 +193,28 @@ public class FSMVisualizer extends JPanel {
         }
 
         /**
-         * Draws a transition between two states.
+         * Draws a transition (arrow) between two states. The transition can either
+         * be a straight arrow, a curved arrow, or a loop, depending on the positions of the states.
          *
-         * @param from    The starting point of the transition.
-         * @param to      The ending point of the transition.
+         * @param from         The starting point of the transition.
+         * @param to           The ending point of the transition.
          * @param inputSymbols The input symbols that trigger the transition.
          */
         public void draw(Point from, Point to, Set<String> inputSymbols) {
-            // Unterscheidung der Pfeilarten
             if (from.equals(to)) {
-                // Schleife (loop)
                 drawLoop(from, inputSymbols);
             } else if (isStraightLine(from, to)) {
-                // Gerader Pfeil
                 drawStraightArrow(from, to, inputSymbols);
             } else {
-                // Gebogener Pfeil (curve)
                 drawCurvedArrow(from, to, inputSymbols);
             }
         }
 
+        /**
+         * Draws an arrow indicating the starting state of the FSM.
+         *
+         * @param to The position of the start state.
+         */
         public void drawStartArrow(Point to) {
             g2.setColor(Color.BLACK);
             Point from = new Point(to.x - this.ovalSize / 3, to.y);
@@ -203,29 +223,28 @@ public class FSMVisualizer extends JPanel {
         }
 
         /**
-         * Prüft, ob die Linie zwischen zwei Punkten eine gerade Linie ist.
-         * Der Zielzustand muss entweder genau rechts oder direkt unterhalb des Startzustands liegen.
+         * Checks if the line between two points is a straight line (either horizontal or vertical).
+         * The target state must either be directly to the right or directly below the source state.
          *
-         * @param from Der Startpunkt.
-         * @param to Der Endpunkt.
-         * @return true, wenn es eine gerade Linie ist (rechts oder unterhalb), ansonsten false.
+         * @param from The starting point of the transition.
+         * @param to   The ending point of the transition.
+         * @return true if it's a straight line, otherwise false.
          */
         private boolean isStraightLine(Point from, Point to) {
-            // Der Zustand liegt genau rechts, wenn y gleich bleibt und x des Endzustands größer ist
             boolean isRight = (from.y == to.y
                     && to.x > from.x
                     && to.x - from.x == 2 * this.ovalSize);
-            // Der Zustand liegt genau unterhalb, wenn x gleich bleibt und y des Endzustands größer ist
             boolean isBelow = to.y > from.y;
-
-            System.out.println(to.y + "==" + from.y + ", isBelow=" + isBelow);
-            System.out.println(to.x + "-" + from.x + "=" + (to.x - from.x) + ", isRight=" + isRight);
 
             return isRight || isBelow;
         }
 
         /**
-         * Zeichnet eine gerade Linie zwischen zwei Punkten.
+         * Draws a straight arrow between two states.
+         *
+         * @param from         The starting point of the arrow.
+         * @param to           The ending point of the arrow.
+         * @param inputSymbols The input symbols that trigger the transition.
          */
         private void drawStraightArrow(Point from, Point to, Set<String> inputSymbols) {
             g2.setColor(Color.BLACK);
@@ -239,7 +258,11 @@ public class FSMVisualizer extends JPanel {
         }
 
         /**
-         * Zeichnet einen gebogenen Pfeil zwischen zwei Punkten.
+         * Draws a curved arrow between two states.
+         *
+         * @param from         The starting point of the arrow.
+         * @param to           The ending point of the arrow.
+         * @param inputSymbols The input symbols that trigger the transition.
          */
         private void drawCurvedArrow(Point from, Point to, Set<String> inputSymbols) {
             g2.setColor(Color.BLACK);
@@ -247,23 +270,18 @@ public class FSMVisualizer extends JPanel {
             Point adjustedFrom = adjustPoint(from, to);
             Point adjustedTo = adjustPoint(to, from);
 
-            int offset = (int) (ovalSize * 0.75);
+            int offset = (int) (ovalSize * 0.8);
 
-            // Kontrollpunkt anpassen, wenn die Punkte auf derselben Y-Ebene liegen
             Point controlPoint;
             if (from.y == to.y) {
-                // Verschiebe den Kontrollpunkt nach oben oder unten, um eine sichtbare Krümmung zu erzeugen
-                controlPoint = new Point((from.x + to.x) / 2, from.y - offset); // z.B. nach oben verschieben
+                controlPoint = new Point((from.x + to.x) / 2, from.y - offset);
             } else {
-                // Normale Berechnung des Kontrollpunkts für eine Kurve
                 controlPoint = new Point((from.x + to.x) / 2 + offset, (from.y + to.y) / 2);
             }
 
-            // Zeichne die Kurve
             QuadCurve2D curve = new QuadCurve2D.Float();
             curve.setCurve(adjustedFrom.x, adjustedFrom.y, controlPoint.x, controlPoint.y, adjustedTo.x, adjustedTo.y);
             g2.draw(curve);
-
 
             double angle = Math.atan2(adjustedTo.y - controlPoint.y, adjustedTo.x - controlPoint.x);
             drawArrowhead(adjustedTo, angle);
@@ -271,15 +289,20 @@ public class FSMVisualizer extends JPanel {
         }
 
         /**
-         * Zeichnet eine Schleife (Loop) für einen Zustand.
+         * Draws a loop (self-transition) on a state.
+         *
+         * @param center       The position of the state.
+         * @param inputSymbols The input symbols that trigger the transition.
          */
         private void drawLoop(Point center, Set<String> inputSymbols) {
             g2.setColor(Color.BLACK);
 
             Point controlPoint = new Point(center.x, center.y - ovalSize + ovalSize/6);
+            int ovalSizeHalf = ovalSize / 2;
+            int offset = 5;
 
             QuadCurve2D q = new QuadCurve2D.Float();
-            q.setCurve(center.x - 5, center.y - ovalSize / 2, controlPoint.x, controlPoint.y, center.x + 5, center.y - ovalSize / 2);
+            q.setCurve(center.x - offset, center.y - ovalSizeHalf, controlPoint.x, controlPoint.y, center.x + offset, center.y - ovalSizeHalf);
             g2.draw(q);
 
             double angle = Math.atan2(ovalSize * 2, 5);
@@ -288,7 +311,10 @@ public class FSMVisualizer extends JPanel {
         }
 
         /**
-         * Zeichnet den Pfeilkopf.
+         * Draws an arrowhead on the end of a transition.
+         *
+         * @param tip   The point where the arrowhead is to be drawn.
+         * @param angle The angle of the arrowhead.
          */
         private void drawArrowhead(Point tip, double angle) {
             g2.setColor(Color.BLACK);
@@ -302,7 +328,11 @@ public class FSMVisualizer extends JPanel {
         }
 
         /**
-         * Zeichnet ein Label für den Pfeil.
+         * Draws the label for a transition (the input symbols that trigger the transition).
+         *
+         * @param inputSymbols The input symbols.
+         * @param from         The starting point of the transition.
+         * @param to           The ending point of the transition.
          */
         private void drawArrowLabel(Set<String> inputSymbols, Point from, Point to) {
             g2.setColor(Color.BLACK);
@@ -313,21 +343,26 @@ public class FSMVisualizer extends JPanel {
             int midX = (from.x + to.x) / 2;
             int midY = (from.y + to.y) / 2;
 
-            double offsetFactor = 0.25;  // Faktor, der die Verschiebung definiert (z.B. 25% der Strecke)
+            double offsetFactor = 0.25;
             int adjustedX = (int) (midX + offsetFactor * (from.x - to.x));
             int adjustedY = (int) (midY + offsetFactor * (from.y - to.y));
 
-            // Zeichne das Label am verschobenen Punkt
             g2.drawString(input, adjustedX - width / 2, adjustedY + fm.getAscent() / 2);
         }
 
 
         /**
-         * Passt einen Punkt basierend auf dem Winkel zwischen zwei Punkten und der ovalSize an.
+         * Adjusts the position of a point based on the oval size and the angle between two points.
+         *
+         * @param from The source point.
+         * @param to   The target point.
+         * @return A new point adjusted based on the oval size.
          */
         private Point adjustPoint(Point from, Point to) {
             double angle = Math.atan2(to.y - from.y, to.x - from.x);
-            return new Point((int) (from.x + ovalSize / 2 * Math.cos(angle)), (int) (from.y + ovalSize / 2 * Math.sin(angle)));
+            int ovalSizeHalf = ovalSize / 2;
+
+            return new Point((int) (from.x + ovalSizeHalf * Math.cos(angle)), (int) (from.y + ovalSizeHalf * Math.sin(angle)));
         }
     }
 

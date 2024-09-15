@@ -1,18 +1,18 @@
 package geje1017.logic.postfix;
 
 /**
- * Provides a utility to validate the syntactic correctness of an infix expression.
- * This class checks the expression against a set of predefined rules,
- * ensuring that it contains only allowed characters, balanced parentheses,
- * correctly placed operators, and adheres to special syntax rules.
+ * Validates the syntactic correctness of an infix expression.
+ * This class checks the expression against a set of predefined rules, ensuring that it contains only allowed characters,
+ * balanced parentheses, correctly placed operators, and adheres to special syntax rules.
  */
 public abstract class ExpressionValidator {
 
     private static final int maxLengthExpression = 30;
 
     /**
-     * Validates an entire infix expression using multiple helper methods to check
-     * different aspects of the expression's syntax.
+     * Validates an entire infix expression by applying multiple checks on its syntax.
+     * The validation ensures that the expression adheres to rules regarding length, characters, parentheses balance,
+     * and operator placement.
      *
      * @param expression The expression to validate.
      * @throws InvalidExpressionException If any part of the expression violates the syntax rules.
@@ -27,11 +27,11 @@ public abstract class ExpressionValidator {
     }
 
     private static void checkLength(String expression) throws InvalidExpressionException {
-        if (expression.length() > maxLengthExpression) {throw new InvalidExpressionException("Expression is too long");};
+        if (expression.length() > maxLengthExpression) throw new InvalidExpressionException("Expression is too long");
     }
 
     /**
-     * Validates that the expression contains only allowed characters.
+     * Validates that the expression contains only allowed characters, including operands and operators.
      *
      * @param expression The expression to check.
      * @throws InvalidExpressionException If the expression contains illegal characters.
@@ -46,7 +46,8 @@ public abstract class ExpressionValidator {
     }
 
     /**
-     * Checks that all parentheses in the expression are balanced.
+     * Validates that the parentheses in the expression are balanced.
+     * Ensures that every opening parenthesis has a corresponding closing parenthesis.
      *
      * @param expression The expression to check.
      * @throws InvalidExpressionException If the parentheses are unbalanced.
@@ -69,11 +70,10 @@ public abstract class ExpressionValidator {
     }
 
     /**
-     * Ensures that operators are placed correctly within the expression,
-     * such as not starting with an operator unless permitted by syntax rules.
+     * Validates that the expression contains only allowed characters, including operands and operators.
      *
      * @param expression The expression to check.
-     * @throws InvalidExpressionException If operators are misplaced.
+     * @throws InvalidExpressionException If the expression contains illegal characters.
      */
     private static void validateUnaryOperatorPlacement(String expression) throws InvalidExpressionException {
         for (int i = 0; i < expression.length(); i++) {
@@ -98,11 +98,11 @@ public abstract class ExpressionValidator {
     }
 
     /**
-     * Checks for violations of special syntax rules, such as consecutive '|' characters,
-     * or '|' characters at the beginning or end of the expression.
+     * Validates the placement of binary operators in the expression, ensuring that they do not
+     * appear in invalid positions (e.g., at the start or end of the expression or consecutively).
      *
      * @param expression The expression to check.
-     * @throws InvalidExpressionException If special syntax rules are violated.
+     * @throws InvalidExpressionException If binary operators are incorrectly placed.
      */
     private static void validateBinaryOperatorPlacement(String expression) throws InvalidExpressionException {
         for (int i = 0; i < expression.length(); i++) {
@@ -131,8 +131,8 @@ public abstract class ExpressionValidator {
     }
 
     /**
-     * Custom exception class for invalid expressions. This provides more specific error
-     * information than a generic exception class.
+     * Custom exception class for invalid expressions.
+     * Provides detailed information about syntax violations in expressions.
      */
     public static class InvalidExpressionException extends Exception {
         public InvalidExpressionException(String message) {

@@ -3,12 +3,16 @@ package geje1017.logic.postfix;
 import java.util.Stack;
 
 /**
- * This class provides methods to convert infix expressions to postfix notation using InputManager.
+ * Converts infix expressions to postfix notation.
+ * The conversion process includes handling operators, operands, parentheses,
+ * and inserting implicit concatenation operators where needed.
  */
 public abstract class ExpressionConverter {
 
     /**
-     * Converts an infix expression to a postfix expression.
+     * Converts an infix expression to its equivalent postfix expression.
+     * The method processes the infix expression by removing whitespace, replacing special symbols,
+     * and inserting necessary concatenation operators before converting it to postfix notation.
      *
      * @param infix The infix expression to be converted.
      * @return The resulting postfix expression.
@@ -18,12 +22,12 @@ public abstract class ExpressionConverter {
         infix = prepareInfixExpression(infix);
         String postfix = processInfixToPostfix(infix);
 
-        return postfix.toString().trim();
+        return postfix.trim();
     }
 
     /**
      * Prepares the infix expression by removing whitespaces, replacing special symbols,
-     * and inserting implicit concatenation operators.
+     * and inserting implicit concatenation operators where needed.
      *
      * @param infix The original infix expression.
      * @return The cleaned and prepared infix expression.
@@ -32,13 +36,14 @@ public abstract class ExpressionConverter {
         infix = infix.replace("\\e", "ε");
         infix = infix.replace("\\0", "Ø");
         infix = infix.replaceAll("\\s+", "");  // Remove white spaces
+
         infix = removeEmptyParentheses(infix);
         return insertImplicitConcatenation(infix);  // Insert commas where needed
     }
 
     /**
-     * Inserts implicit concatenation operators (',') where needed in the infix expression.
-     * It checks for scenarios where concatenation is assumed between characters.
+     * Inserts implicit concatenation operators (',') in the infix expression.
+     * It checks for situations where concatenation is implied between characters.
      *
      * @param expression The infix expression.
      * @return The modified infix expression with explicit concatenation operators.
@@ -64,15 +69,15 @@ public abstract class ExpressionConverter {
     }
 
     /**
-     * Determines if a concatenation operator should be inserted between two characters.
+     * Determines whether a concatenation operator should be inserted between two characters.
+     * Concatenation is inserted between operands, between an operand and an opening parenthesis,
+     * between a closing parenthesis and an operand, and between two parentheses (when the first is closing and the second is opening).
      *
      * @param current The current character in the expression.
      * @param next The next character in the expression.
-     * @return true if concatenation should be inserted, false otherwise.
+     * @return {@code true} if a concatenation operator should be inserted, otherwise {@code false}.
      */
     private static boolean shouldInsertConcatenation(char current, char next) {
-        // Concatenation is necessary between two operands (e.g., "ab"), between an operand and an opening parenthesis (e.g., "a("),
-        // between a closing parenthesis and an operand (e.g., ")a"), and between two parentheses if the first is closing and the second is opening (e.g., ")(").
         return (InputManager.isOperand(current) && InputManager.isOperand(next)) ||
                 (InputManager.isOperand(current) && next == InputManager.OperatorType.PARENTHESIS_OPEN.getSymbol()) ||
                 (current == InputManager.OperatorType.PARENTHESIS_CLOSE.getSymbol() && InputManager.isOperand(next)) ||
@@ -81,9 +86,9 @@ public abstract class ExpressionConverter {
     }
 
     /**
-     * Removes empty parentheses pairs from the expression efficiently.
+     * Removes empty parentheses from the infix expression.
      *
-     * @param expression The original expression with potential empty parentheses.
+     * @param expression The expression that may contain empty parentheses.
      * @return The expression with all empty parentheses removed.
      */
     public static String removeEmptyParentheses(String expression) {
@@ -95,6 +100,13 @@ public abstract class ExpressionConverter {
         return expression;
     }
 
+    /**
+     * Processes the infix expression and converts it into postfix notation.
+     * This method handles operators, parentheses, and operator precedence during the conversion.
+     *
+     * @param infix The infix expression to be converted.
+     * @return The converted postfix expression.
+     */
     private static String processInfixToPostfix(String infix) {
         StringBuilder postfix = new StringBuilder();
         Stack<Character> stack = new Stack<>();

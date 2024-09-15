@@ -1,4 +1,4 @@
-package geje1017.gui;
+package geje1017.gui.customGuiElements;
 
 import geje1017.logic.finiteStateMachine.FSMStructure;
 import javax.swing.*;

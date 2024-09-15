@@ -6,6 +6,10 @@ import geje1017.logic.finiteStateMachine.State;
 import static geje1017.logic.finiteStateMachine.FSMOperator.FSMCopier.copyFsm;
 import static geje1017.logic.finiteStateMachine.FSMOperator.FSMSymbolConverter.convertEmptyString;
 
+/**
+ * Applies closure operations to deterministic finite state machines (FSM).
+ * It supports both Kleene closure (zero or more repetitions) and positive closure (one or more repetitions).
+ */
 public class FSMClosureApplier{
 
     /**
@@ -18,8 +22,8 @@ public class FSMClosureApplier{
     public static FSMStructure applyPositiveClosure(FSMStructure fsm) {
 
         FSMStructure copyFsm = copyFsm(fsm);
-
         FSMStructure positiveClosureFsm = new FSMStructure();
+        positiveClosureFsm.setExplanation("Repeating the DFSM at least one time.\n");
 
         positiveClosureFsm.addAllTransitions(copyFsm.getTransitions());
         State startStatesFsm = copyFsm.getStartState();
@@ -47,8 +51,10 @@ public class FSMClosureApplier{
         String temp = "(" + fsm.getExpression() + ")*";
 
         FSMStructure kleeneClosureFsm = applyPositiveClosure(fsm);
+
         convertEmptyString(kleeneClosureFsm);
 
+        kleeneClosureFsm.setExplanation("Repeating the DFSM zero or more times.\n");
         kleeneClosureFsm.setExpression(temp);
         return kleeneClosureFsm;
 

@@ -8,10 +8,18 @@ import geje1017.logic.finiteStateMachine.State;
 
 import java.util.Stack;
 
+/**
+ * Evaluates infix regular expressions by converting them to postfix notation,
+ * generating finite state machines (FSMs) for the expression, and performing operations such as concatenation,
+ * alternation, and closure.
+ */
 public class ExpressionEvaluator {
 
     /**
-     * Evaluates an infix regular expression and returns an FSMStorage object.
+     * Evaluates an infix regular expression, converts it to postfix notation, and processes it into FSM structures.
+     *
+     * @param expression The infix regular expression to evaluate.
+     * @return An FSMStorage object containing the generated FSM structures for the expression.
      */
     public FSMStorage evaluateExpression(String expression) {
         State.resetUniqueName();
@@ -20,6 +28,13 @@ public class ExpressionEvaluator {
         return evaluatePostfixExpression(postfixExpression);
     }
 
+    /**
+     * Evaluates a postfix expression by generating FSMs for the operands and applying the appropriate operations
+     * (concatenation, alternation, or closure) based on the operators.
+     *
+     * @param postfixExpression The postfix expression to evaluate.
+     * @return An FSMStorage object containing the FSM structures.
+     */
     private FSMStorage evaluatePostfixExpression(String postfixExpression) {
         FSMStorage storage = new FSMStorage();
         Stack<FSMStructure> stack = new Stack<>();
@@ -31,11 +46,10 @@ public class ExpressionEvaluator {
             if (InputManager.isOperator(currentChar)) {
                 fsm = processOperator(currentChar, stack);
                 if (fsm != null) {
-                    FSMStructure operationFSM = fsm;
-                    FSMStructure deterministicFSM = FSMDeterminizer.toDeterministicFsm(operationFSM);
+                    FSMStructure deterministicFSM = FSMDeterminizer.toDeterministicFsm(fsm);
                     FSMStructure minimizedFSM = FSMMinimizer.minimize(deterministicFSM);
                     FSMStructure simplifiedFSM = FSMSimplifier.simplify(minimizedFSM);
-                    FSMGroup group = new FSMGroup(operationFSM, deterministicFSM, minimizedFSM, simplifiedFSM);
+                    FSMGroup group = new FSMGroup(fsm, deterministicFSM, minimizedFSM, simplifiedFSM);
                     storage.addFSMGroup(group);
                     stack.push(simplifiedFSM);
                 }
@@ -49,6 +63,13 @@ public class ExpressionEvaluator {
         return storage;
     }
 
+    /**
+     * Processes an operator in the postfix expression and applies the corresponding FSM operation.
+     *
+     * @param operator The operator to process (e.g., concatenation, alternation, closure).
+     * @param stack The stack of FSM structures used in the evaluation.
+     * @return The resulting FSM after applying the operator.
+     */
     private FSMStructure processOperator(char operator, Stack<FSMStructure> stack) {
         FSMStructure result = null;
         FSMStructure fsm1, fsm2;

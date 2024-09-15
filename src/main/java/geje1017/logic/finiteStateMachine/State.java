@@ -4,7 +4,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Represents a state in an automaton, with unique identification and properties to define its role in transitions.
+ * Represents a state in a finite state machine (FSM).
+ * Each state has a unique identifier, and it can be marked as a start state, final state, or new state.
+ * States can also be fused with other states, combining their identifiers.
  */
 public class State {
 
@@ -16,7 +18,7 @@ public class State {
     private boolean isNew;
 
     /**
-     * Constructor for a standard state with unique name generation.
+     * Constructs a new state with a unique identifier.
      *
      * @param isStartState Indicates if this is a start state.
      * @param isFinalState Indicates if this is a final state.
@@ -29,7 +31,7 @@ public class State {
     }
 
     /**
-     * Constructor for creating a state from a set of numbers.
+     * Constructs a new state from a list of numbers representing the state's identifier.
      *
      * @param numbers A list of integers representing the state.
      * @param isStartState Indicates if this is a start state.
@@ -43,9 +45,9 @@ public class State {
     }
 
     /**
-     * Copy constructor to create a new state from an existing one.
+     * Copy constructor to create a new state from an existing state.
      *
-     * @param other The state to copy from.
+     * @param other The state to copy.
      */
     public State(State other) {
         this(other.numbers, other.isStartState, other.isFinalState);
@@ -53,11 +55,11 @@ public class State {
     }
 
     /**
-     * Static method to fuse multiple states into one.
+     * Static method to fuse multiple states into one by combining their identifiers.
      *
-     * @param statesToFuse A set of states to fuse. Must not be null or empty.
+     * @param statesToFuse A set of states to fuse together. Must not be null or empty.
      * @return A new fused state. If only one state is provided, returns that state.
-     * @throws IllegalArgumentException if statesToFuse is null or empty.
+     * @throws IllegalArgumentException If the set of states to fuse is null or empty.
      */
     public static State fuseState(Set<State> statesToFuse) {
 
@@ -85,18 +87,20 @@ public class State {
         return fusedState;
     }
 
+    /**
+     * Fuses the current state with another state by combining their identifiers.
+     *
+     * @param stateToFuseWith The state to fuse with this state.
+     */
     public void fuseStateName(State stateToFuseWith) {
         this.numbers.addAll(stateToFuseWith.getNumbers());
         this.isNew = true;
     }
 
     // Getter and setter methods
+
     public List<Integer> getNumbers() {
         return Collections.unmodifiableList(numbers);
-    }
-
-    public void setNumbers(List<Integer> numbers) {
-        this.numbers = numbers;
     }
 
     public boolean isStartState() {

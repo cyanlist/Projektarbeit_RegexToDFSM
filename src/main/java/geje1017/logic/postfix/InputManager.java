@@ -6,12 +6,12 @@ import java.util.Map;
 /**
  * Manages input processing by identifying and categorizing different types
  * of symbols in expressions, particularly focusing on operators and special symbols
- * like empty symbol and empty set.
+ * like the empty symbol (epsilon) and the empty set.
  */
 public class InputManager {
 
     /**
-     * Enumerates different types of operators with their symbols and precedence levels.
+     * Enumerates different types of operators, each with its symbol and precedence level.
      */
     public enum OperatorType {
         ALTERNATION('|', 1),
@@ -28,6 +28,8 @@ public class InputManager {
             this.symbol = symbol;
             this.priority = priority;
         }
+
+        // Getter and setter methods
 
         public char getSymbol() {
             return symbol;
@@ -53,16 +55,17 @@ public class InputManager {
      * the empty symbol (epsilon), and the empty set.
      *
      * @param c the character to check
-     * @return true if the character is an operand, false otherwise
+     * @return {@code true} if the character is an operand, {@code false} otherwise
      */
     public static boolean isOperand(char c) {
         return Character.isLetterOrDigit(c)
                 || c == InputManager.getEmptySymbol()
-                || c == InputManager.getEmptySet();
+                || c == InputManager.getEmptySet()
+                || c == '\\';
     }
 
     /**
-     * Returns the symbol used to represent the empty string in expressions.
+     * Returns the symbol used to represent the empty string (epsilon) in expressions.
      *
      * @return the empty symbol character
      */
@@ -80,20 +83,20 @@ public class InputManager {
     }
 
     /**
-     * Checks if a given character is an operator by checking its presence in the operator map.
+     * Checks if a given character is an operator by verifying its presence in the operator map.
      *
      * @param c the character to check
-     * @return true if the character is an operator, false otherwise
+     * @return {@code true} if the character is an operator, {@code false} otherwise
      */
     public static boolean isOperator(char c) {
         return operatorMap.containsKey(c);
     }
 
     /**
-     * Determines if the character is a unary operator, specifically Kleene closure or positive closure.
+     * Determines if the character is a binary operator, specifically alternation or concatenation.
      *
      * @param c the character to check
-     * @return true if the character is a unary operator, false otherwise
+     * @return {@code true} if the character is a binary operator, {@code false} otherwise
      */
     public static boolean isUnaryOperator(char c) {
         return c == OperatorType.KLEENE_CLOSURE.getSymbol()
@@ -125,7 +128,7 @@ public class InputManager {
      *
      * @param op1 the first operator character
      * @param op2 the second operator character
-     * @return true if the first operator has equal or higher priority, false otherwise
+     * @return {@code true} if the first operator has equal or higher priority, {@code false} otherwise
      */
     public static boolean hasEqualOrHigherPriority(char op1, char op2) {
         return getPriority(op1) >= getPriority(op2);

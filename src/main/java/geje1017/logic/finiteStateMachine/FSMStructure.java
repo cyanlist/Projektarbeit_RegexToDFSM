@@ -4,9 +4,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Represents the implementation of a finite state machine.
- * This class manages states and transitions, allowing for operations like adding transitions,
- * converting to a deterministic finite state machine, and more.
+ * Represents a finite state machine (FSM) implementation.
+ * This class manages states and transitions, providing functionalities such as adding transitions,
+ * retrieving states and transitions, and creating a string representation of the FSM.
  */
 public class FSMStructure {
 
@@ -16,7 +16,9 @@ public class FSMStructure {
     private String explanation = "";
 
     /**
-     * Constructs a new finite state machine with empty transitions.
+     * Constructs a new finite state machine (FSM) with empty transitions.
+     * States are ordered by whether they are start states, by their first number,
+     * and by their string representation.
      */
     public FSMStructure() {
         this.transitions = new TreeMap<>(Comparator
@@ -27,28 +29,32 @@ public class FSMStructure {
     }
 
     /**
-     * Adds a transition from a source state to a target state with given input symbols.
+     * Adds a transition from a source state to a target state with the given input symbols.
+     * If the source or target states do not already exist in the FSM, they are added.
      *
-     * @param sourceState The starting state of the transition.
-     * @param inputSymbol The symbols that trigger the transition.
-     * @param targetState The ending state of the transition.
+     * @param sourceState The state from which the transition begins.
+     * @param inputSymbol The set of symbols that trigger the transition.
+     * @param targetState The state to which the transition leads.
      */
     public void addTransition(State sourceState, Set<String> inputSymbol, State targetState) {
         if (sourceState != null) {
             transitions.putIfAbsent(sourceState, new HashMap<>());
             if (targetState != null) {
                 transitions.putIfAbsent(targetState, new HashMap<>());
-                transitions.get(sourceState).putIfAbsent(targetState, new CustomHashSet<>());
-                transitions.get(sourceState).get(targetState).addAll(inputSymbol);
+                if (inputSymbol != null) {
+                    transitions.get(sourceState).putIfAbsent(targetState, new CustomHashSet<>());
+                    transitions.get(sourceState).get(targetState).addAll(inputSymbol);
+                }
             }
         }
     }
 
     /**
-     * Returns a string representation of the finite state machine.
-     * This includes the represented expression, states, transitions, startStates and finalStates.
+     * Returns a string representation of the FSM.
+     * This representation includes the set of states (Q), the input alphabet (∑), the transition function (δ),
+     * the set of start states (S), and the set of final states (F).
      *
-     * @return A string detailing the current definition of the FSM.
+     * @return A string detailing the current configuration of the FSM.
      */
     @Override
     public String toString() {
@@ -77,7 +83,8 @@ public class FSMStructure {
     }
 
     /**
-     * Adds all transitions from another map of transitions to this finite state machine.
+     * Adds all transitions from another FSM to this FSM.
+     * Transitions are added from the provided transition map to this FSM's transitions.
      *
      * @param transitionsToAdd A map of transitions to add to this FSM.
      */
@@ -94,6 +101,7 @@ public class FSMStructure {
     public String getExpression() {
         return this.expression;
     }
+
     public void setExpression(String expression) {
         this.expression = expression;
     }
@@ -119,6 +127,10 @@ public class FSMStructure {
     }
 
     public void setExplanation(String explanation) {
+        this.explanation = explanation;
+    }
+
+    public void addExplanation(String explanation) {
         this.explanation = this.explanation + explanation;
     }
 

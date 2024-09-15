@@ -9,9 +9,9 @@ import java.util.*;
 import static geje1017.logic.finiteStateMachine.FSMOperator.FSMCopier.copyFsm;
 
 /**
- * Provides functionality to concatenate two deterministic finite state machines (FSMs).
+ * Concatenates two deterministic finite state machines (FSMs).
  * Concatenation is defined as connecting the final states of the first FSM to the start state of the second FSM,
- * effectively making the sequence of the first FSM followed by the sequence of the second FSM.
+ * creating a new FSM that processes the sequence of the first FSM followed by the sequence of the second FSM.
  */
 public class FSMConcatenator {
 
@@ -38,7 +38,8 @@ public class FSMConcatenator {
 
     /**
      * Checks for special concatenation cases such as empty set or empty string,
-     * which can significantly simplify the concatenation operation.
+     * which can simplify the concatenation process. For example, if one FSM represents an empty set,
+     * it directly affects the result.
      *
      * @param fsm1 The first FSM.
      * @param fsm2 The second FSM.
@@ -62,7 +63,7 @@ public class FSMConcatenator {
 
     /**
      * Performs the actual concatenation of two FSMs, linking the final states of the first FSM
-     * with the start state of the second FSM.
+     * with the start state of the second FSM. It also merges transitions between the two FSMs.
      *
      * @param fsm1 The first FSM.
      * @param fsm2 The second FSM.
@@ -72,6 +73,7 @@ public class FSMConcatenator {
 
         FSMStructure concatenatedFsm = new FSMStructure();
         concatenatedFsm.setExpression(fsm1.getExpression() + fsm2.getExpression());
+        concatenatedFsm.setExplanation("Merging two DFSM by connecting the final states of the first to the start state of the second.\n");
 
         fsm1 = FSMCopier.copyFsm(fsm1);
         fsm2 = FSMCopier.copyFsm(fsm2);
@@ -81,22 +83,22 @@ public class FSMConcatenator {
 
         concatenatedFsm.addAllTransitions(fsm1.getTransitions());
 
-        fsm2.getTransitions().forEach((sourceState, transitions) -> {
-            transitions.forEach((targetState, symbols) -> {
+        // Add transitions for FSM2, connecting start states and final states
+        fsm2.getTransitions().forEach((sourceState, transitions) -> transitions.forEach((targetState, symbols) -> {
 
-                if (sourceState.isStartState() || targetState.isStartState()) {
-                    for (State currentFinalState : fsm1FinalStates) {
-                        State newSource = sourceState.isStartState() ? currentFinalState : sourceState;
-                        State newTarget = targetState.isStartState() ? currentFinalState : targetState;
-                        concatenatedFsm.addTransition(newSource, symbols, newTarget);
-                    }
+            if (sourceState.isStartState() || targetState.isStartState()) {
+                for (State currentFinalState : fsm1FinalStates) {
+                    State newSource = sourceState.isStartState() ? currentFinalState : sourceState;
+                    State newTarget = targetState.isStartState() ? currentFinalState : targetState;
+                    concatenatedFsm.addTransition(newSource, symbols, newTarget);
                 }
-                else {
-                    concatenatedFsm.addTransition(sourceState, symbols, targetState);
-                }
-            });
-        });
+            }
+            else {
+                concatenatedFsm.addTransition(sourceState, symbols, targetState);
+            }
+        }));
 
+        // Handle case where the start state of fsm2 is not a final state
         if (!fsm2StartState.isFinalState) {
             for (State currentState : fsm1FinalStates) {
                 currentState.fuseStateName(fsm2StartState);
@@ -105,63 +107,6 @@ public class FSMConcatenator {
         }
 
         fsm2StartState.resetStartState();
-        return concatenatedFsm;
-    }
-
-    private static FSMStructure performConcatenation2(FSMStructure fsm1, FSMStructure fsm2) {
-
-        FSMStructure concatenatedFsm = new FSMStructure();
-        concatenatedFsm.setExpression(fsm1.getExpression() + fsm2.getExpression());
-
-        Set<State> finalStatesFsm1 = new HashSet<>(fsm1.getFinalStates());
-        State initialStateFsm2 = fsm2.getStartState();
-
-        // Iterate over each final state of fsm1
-        Map<State, State> fusedStatesMap = new HashMap<>();
-        for (State finalStateFsm1 : finalStatesFsm1) {
-            // Fuse each final state of fsm1 with the start state of fsm2 individually
-            Set<State> fuseStateSet = new HashSet<>();
-            fuseStateSet.add(finalStateFsm1);
-            fuseStateSet.add(initialStateFsm2);
-            State fusedState = State.fuseState(fuseStateSet);
-            if (!initialStateFsm2.isFinalState()) fusedState.resetFinalState();
-            if (!finalStateFsm1.isStartState()) fusedState.resetStartState();
-            // Store the fused state to use in transition copying
-            fusedStatesMap.put(finalStateFsm1, fusedState);
-        }
-
-        // Copy transitions from fsm1 to the concatenated FSM
-        fsm1.getTransitions().forEach((sourceState, transitions) -> {
-            transitions.forEach((targetState, symbols) -> {
-                State newSource = fusedStatesMap.getOrDefault(sourceState, sourceState);
-                State newTarget = fusedStatesMap.getOrDefault(targetState, targetState);
-                concatenatedFsm.addTransition(newSource, symbols, newTarget);
-            });
-        });
-
-        // Copy transitions from fsm2 to the concatenated FSM
-        fsm2.getTransitions().forEach((sourceState, transitions) -> {
-            transitions.forEach((targetState, symbols) -> {
-                // Handle transitions involving the start state of fsm2
-                if (sourceState.equals(initialStateFsm2)) {
-                    // For each fused state, add transitions to targetState
-                    fusedStatesMap.values().forEach(fusedState -> {
-                        concatenatedFsm.addTransition(fusedState, symbols, targetState);
-                    });
-                } else if (targetState.equals(initialStateFsm2)) {
-                    // Add transitions from sourceState to each fused state
-                    fusedStatesMap.forEach((finalStateFsm1, fusedState) -> {
-                        concatenatedFsm.addTransition(sourceState, symbols, fusedState);
-                    });
-                } else {
-                    // Standard transition copy for other states
-                    concatenatedFsm.addTransition(sourceState, symbols, targetState);
-                }
-            });
-        });
-
-        initialStateFsm2.resetStartState();
-
         return concatenatedFsm;
     }
 

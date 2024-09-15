@@ -8,6 +8,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Creates deep copies of finite state machines (FSM).
+ * This ensures that a duplicated FSM, including all its states, transitions, and expressions,
+ * can be modified independently of the original FSM.
+ */
 public class FSMCopier {
 
     /**
@@ -33,7 +38,7 @@ public class FSMCopier {
             copy.addTransition(newState, null, null);
         }
         // Next, copy all transitions using the previously created state mapping.
-        // This loop iterates over all entries in the original FSM's transitions map.
+        // This loop iterates over all entries in the original FSM transitions map.
         fsm.getTransitions().forEach((src, tgtMap) -> {
             State newSrc = stateMapping.get(src);
             tgtMap.forEach((tgt, symbols) -> {

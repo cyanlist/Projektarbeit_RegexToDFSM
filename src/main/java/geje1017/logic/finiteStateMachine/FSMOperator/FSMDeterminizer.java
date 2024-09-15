@@ -8,11 +8,18 @@ import java.util.*;
 
 import static geje1017.logic.finiteStateMachine.FSMOperator.FSMCopier.copyFsm;
 
+/**
+ * Converts a non-deterministic finite automaton (NFA) into a deterministic finite automaton (DFA)
+ * using the subset construction method.
+ */
 public class FSMDeterminizer {
 
     /**
      * Converts a non-deterministic finite automaton (NFA) to a deterministic finite automaton (DFA)
      * using the subset construction method.
+     * The conversion involves creating new states in the DFA that correspond to sets of states from the NFA.
+     * Transitions between these sets of states are determined by analyzing the transitions in the NFA.
+     *
      * @param fsm The NFA to be converted.
      * @return A new DFA that represents the deterministic version of the input NFA.
      */
@@ -20,6 +27,7 @@ public class FSMDeterminizer {
 
         FSMStructure copyFsm = copyFsm(fsm);
         FSMStructure deterministicFsm = new FSMStructure();
+        deterministicFsm.setExplanation("Transforming the FSM into a deterministic version.\n");
 
         // Map from sets of NFA states to DFA states.
         Map<Set<State>, State> stateMap = new HashMap<>();

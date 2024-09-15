@@ -1,21 +1,22 @@
-package geje1017.gui;
+package geje1017.gui.customGuiElements;
 
+import geje1017.gui.FSMGroup;
 import geje1017.logic.finiteStateMachine.FSMStructure;
 
 import javax.swing.*;
 import java.awt.*;
 
 /**
- * FSMResultPanel zeigt das Ergebnis des FSM-Prozesses mit einer umschaltbaren Detailansicht.
+ * IntermediateStepFSMPanel zeigt das Ergebnis des FSM-Prozesses mit einer umschaltbaren Detailansicht.
  * Es erbt gemeinsame Funktionalitäten von AbstractFSMPanel.
  */
-public class FSMResultPanel extends AbstractFSMPanel {
+public class IntermediateStepFSMPanel extends AbstractFSMPanel {
 
     private boolean isCollapsed = true;
     private int subStep = 1;
-    private int ownStep;
+    private final int ownStep;
 
-    public FSMResultPanel(FSMGroup fsmGroup) {
+    public IntermediateStepFSMPanel(FSMGroup fsmGroup) {
         super(fsmGroup);
         ownStep = getStep();
         toggleDetails();
@@ -23,7 +24,6 @@ public class FSMResultPanel extends AbstractFSMPanel {
 
     @Override
     protected void setupPanel() {
-        // Diese Methode kann leer bleiben, da wir die Ansicht in toggleDetails() initialisieren
     }
 
     /**
@@ -33,9 +33,9 @@ public class FSMResultPanel extends AbstractFSMPanel {
         detailsPanel.removeAll();
 
         if (isCollapsed) {
-            addMinimizedView(); // Zeigt nur grundlegende Informationen an
+            addMinimizedView();
         } else {
-            addExpandedView();  // Zeigt detaillierte FSM-Informationen an
+            addExpandedView();
         }
 
         revalidate();
@@ -49,7 +49,7 @@ public class FSMResultPanel extends AbstractFSMPanel {
         GridBagConstraints gbc = createDefaultGBC();
 
         FSMStructure fsm = fsmGroup.getSimplifiedFSM();
-        setBorder(createTitledBorder(fsm, ownStep + ") " +  fsm.getExpression()));
+        setBorder(createTitledBorder(ownStep + ") Current step: " +  fsm.getExpression()));
         detailsPanel.add(createToggleButton(), gbc);
         gbc.fill = GridBagConstraints.CENTER;
 
@@ -63,11 +63,9 @@ public class FSMResultPanel extends AbstractFSMPanel {
         GridBagConstraints gbc = createDefaultGBC();
         subStep = 1;
 
-        // Umschalt-Button oben hinzufügen
         detailsPanel.add(createToggleButton(), gbc);
         gbc.gridy++;
 
-        // FSMs (Operation, Deterministisch, Minimiert) mit Details hinzufügen
         addFSMDetails(gbc, fsmGroup.getOperationFSM(), "Operation FSM");
         addFSMDetails(gbc, fsmGroup.getDeterministicFSM(), "Deterministic FSM");
         addFSMDetails(gbc, fsmGroup.getMinimizedFSM(), "Minimized FSM");
@@ -96,25 +94,23 @@ public class FSMResultPanel extends AbstractFSMPanel {
     protected void addFSMDetails(GridBagConstraints gbc, FSMStructure fsm, String description) {
         gbc.gridy++;
 
-        // Beschreibung der FSM (Schrittzahl und Typ)
         JTextArea step = setupTextArea(new JTextArea(subStep++ + ") " + description));
         detailsPanel.add(step, gbc);
 
-        // Visualisierung und Erklärung der FSM
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setResizeWeight(0.5);
-        splitPane.setContinuousLayout(true);
         splitPane.setLeftComponent(new FSMVisualizer(fsm));
 
-        // FSM-Details (Textbereich für die Definition und Erklärung)
-        JTextArea definitionArea = setupTextArea(new JTextArea(fsm.toString()));
+        JTextArea definitionArea = setupTextArea(new JTextArea());
+        definitionArea.append(fsm.toString() + "\n\n");
+        definitionArea.append("--------------------------------------------------\n\n");
+        definitionArea.append(fsm.getExplanation());
+
         splitPane.setRightComponent(new JScrollPane(definitionArea));
 
         gbc.gridy++;
         detailsPanel.add(splitPane, gbc);
 
-        // Optional: Erklärung zu dem FSM hinzufügen (falls verfügbar)
-        JTextArea explanationArea = setupTextArea(new JTextArea(fsm.getExplanation()));
+        JTextArea explanationArea = setupTextArea(new JTextArea("\n"));
         gbc.gridy++;
         detailsPanel.add(explanationArea, gbc);
     }

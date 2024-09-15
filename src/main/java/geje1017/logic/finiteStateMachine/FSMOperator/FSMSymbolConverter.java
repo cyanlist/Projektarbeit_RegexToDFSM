@@ -7,26 +7,35 @@ import geje1017.logic.postfix.InputManager;
 import java.util.Collections;
 import java.util.HashSet;
 
+/**
+ * Converts input symbols into corresponding finite state machines (FSM).
+ * It supports conversion for regular input symbols, the empty string, and the empty set.
+ */
 public class FSMSymbolConverter{
 
         /**
-         * Converts the input symbol to an FSM.
+         * Converts an input symbol to a finite state machine (FSM).
+         * If the input symbol is a valid operand, it creates an FSM that represents the symbol.
          *
          * @param inputSymbol The input symbol to be converted.
-         * @return The converted FSM.
+         * @return A new FSM representing the input symbol.
+         * @throws IllegalArgumentException If the input symbol is not a valid operand.
          */
         public static FSMStructure convertInputCharacter(char inputSymbol) {
             FSMStructure convertedFSM = new FSMStructure();
 
+            // Validate the input symbol using InputManager
             if (!InputManager.isOperand(inputSymbol)) {
                 throw new IllegalArgumentException("Invalid input symbol: " + inputSymbol);
             }
+            // Handle special cases for empty string and empty set
             if (inputSymbol == InputManager.getEmptySymbol()) {
                 convertEmptyString(convertedFSM);
             }
             else if (inputSymbol == InputManager.getEmptySet()) {
                 convertEmptySet(convertedFSM);
             }
+            // Handle regular input symbols
             else {
                 convertRegularSymbol(convertedFSM, inputSymbol);
             }
@@ -34,18 +43,20 @@ public class FSMSymbolConverter{
         }
 
     /**
-     * Handles the case when the input symbol is "e".
+     * Converts the FSM to handle the empty string (epsilon).
+     * In this case, the FSM consists of a single state that is both a start state and a final state.
      *
      * @param fsm The FSM to be modified.
      */
     protected static void convertEmptyString(FSMStructure fsm) {
         State startEndState = new State(true, true);
-        fsm.addTransition(startEndState, Collections.emptySet(), startEndState);
+        fsm.addTransition(startEndState, null, startEndState);
         fsm.setExpression(fsm.getExpression().isEmpty() ? String.valueOf(InputManager.getEmptySymbol()) : fsm.getExpression());
     }
 
     /**
-     * Handles the case when the input symbol is "0/".
+     * Converts the FSM to handle the empty set.
+     * The FSM will consist of a start state with no transitions to any other states.
      *
      * @param fsm The FSM to be modified.
      */
@@ -56,10 +67,11 @@ public class FSMSymbolConverter{
     }
 
     /**
-     * Handles the case when the input symbol is a regular symbol.
+     * Converts the FSM to handle a regular input symbol.
+     * The FSM will have a start state and a final state, with a transition for the given input symbol.
      *
      * @param fsm The FSM to be modified.
-     * @param inputSymbol The input symbol.
+     * @param inputSymbol The input symbol that the FSM should recognize.
      */
     private static void convertRegularSymbol(FSMStructure fsm, char inputSymbol) {
         State startState = new State(true, false);
