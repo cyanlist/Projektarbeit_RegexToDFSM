@@ -42,7 +42,7 @@ The project is modular and follows the principle of single responsibility. Each 
 The project is platform-independent and runs on both Windows and Linux. Although a macOS version has not been tested, the application should run on Apple devices provided Java is installed.
 
 ## License
-This project is licensed under the MIT License. 
+This project is licensed under the MIT License.  
 
 ---
 
