@@ -1,6 +1,5 @@
 package geje1017.logic.finiteStateMachine.FSMOperator;
 
-import geje1017.logic.finiteStateMachine.CustomHashSet;
 import geje1017.logic.finiteStateMachine.FSMStructure;
 import geje1017.logic.finiteStateMachine.State;
 
@@ -40,7 +39,7 @@ public class FSMDeterminizer {
         stateMap.put(startSet, dfaStartState);
         queue.add(startSet);
         // deterministicFsm.transitions.put(dfaStartState, new HashMap<>());
-        deterministicFsm.addTransition(dfaStartState, null, null);
+        deterministicFsm.addState(dfaStartState);
 
         // Process all sets of states.
         while (!queue.isEmpty()) {
@@ -49,7 +48,7 @@ public class FSMDeterminizer {
             // Map to track transitions for the current set based on input symbols.
             Map<String, Set<State>> transitionMap = new HashMap<>();
             for (State state : currentSet) {
-                copyFsm.transitions.getOrDefault(state, new HashMap<>()).forEach((target, symbols) -> symbols.forEach(symbol -> transitionMap.computeIfAbsent(symbol, k -> new CustomHashSet<>()).add(target)));
+                copyFsm.transitions.getOrDefault(state, new HashMap<>()).forEach((target, symbols) -> symbols.forEach(symbol -> transitionMap.computeIfAbsent(symbol, k -> new HashSet<>()).add(target)));
             }
 
             // Create new transitions and states in the DFA.
@@ -63,7 +62,7 @@ public class FSMDeterminizer {
                     deterministicFsm.transitions.put(newState, new HashMap<>());
                 }
                 State targetState = stateMap.get(targetSet);
-                deterministicFsm.transitions.get(currentState).computeIfAbsent(targetState, k -> new CustomHashSet<>()).add(symbol);
+                deterministicFsm.transitions.get(currentState).computeIfAbsent(targetState, k -> new HashSet<>()).add(symbol);
             });
         }
 

@@ -29,7 +29,7 @@ public class FSMStructure {
     }
 
     /**
-     * Adds a transition from a source state to a target state with the given input symbols.
+     * Adds a states and transition from a source state to a target state with the given input symbols.
      * If the source or target states do not already exist in the FSM, they are added.
      *
      * @param sourceState The state from which the transition begins.
@@ -37,15 +37,21 @@ public class FSMStructure {
      * @param targetState The state to which the transition leads.
      */
     public void addTransition(State sourceState, Set<String> inputSymbol, State targetState) {
-        if (sourceState != null) {
-            transitions.putIfAbsent(sourceState, new HashMap<>());
-            if (targetState != null) {
-                transitions.putIfAbsent(targetState, new HashMap<>());
-                if (inputSymbol != null) {
-                    transitions.get(sourceState).putIfAbsent(targetState, new CustomHashSet<>());
-                    transitions.get(sourceState).get(targetState).addAll(inputSymbol);
-                }
-            }
+        if (sourceState != null
+                && targetState != null
+                && !inputSymbol.isEmpty()) {
+
+            addState(sourceState);
+            addState(targetState);
+
+            this.transitions.get(sourceState).putIfAbsent(targetState, new HashSet<>());
+            this.transitions.get(sourceState).get(targetState).addAll(inputSymbol);
+        }
+    }
+
+    public void addState(State state) {
+        if (state != null) {
+            this.transitions.putIfAbsent(state, new HashMap<>());
         }
     }
 
@@ -59,28 +65,51 @@ public class FSMStructure {
     @Override
     public String toString() {
         StringBuilder res = new StringBuilder();
+
+        // Basis structure of the automaton
         res.append("M=(Q,∑,δ,S,F)");
+
+        // Q (States)
         res.append("\nQ=").append(getStates());
-        res.append("\n∑=").append(transitions.values().stream()
+
+        // ∑ (Alphabet)
+        res.append("\n∑=").append(this.transitions.values().stream()
                 .flatMap(map -> map.values().stream())
                 .flatMap(Set::stream)
                 .distinct()
                 .collect(Collectors.toList()));
+
+        // δ (Transitions)
         res.append("\nδ: Q x ∑ --> Q: {");
-        transitions.forEach((sourceState, transitionMap) -> {
+        this.transitions.forEach((sourceState, transitionMap) -> {
             transitionMap.forEach((targetState, symbols) -> {
                 symbols.forEach(symbol -> {
-                    res.append("\n     δ(").append(sourceState).append(", ").append(symbol).append(") = ").append(targetState);
+                    res.append("\n     δ(")
+                            .append(sourceState).append(", ")
+                            .append(symbol).append(") = ")
+                            .append(targetState);
                 });
             });
         });
-        res.append("}");
+        res.append("\n}");
 
+        // Start states (S) and final states (F)
         res.append("\nS=").append(getStartStates());
         res.append("\nF=").append(getFinalStates());
 
-        return res.toString();
+        // Set correct parenthesis
+        return res.toString()
+                .replace("[", "{")
+                .replace("]", "}");
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FSMStructure fsm)) return false;
+        return this.toString().equals(fsm.toString());
+    }
+
 
     /**
      * Adds all transitions from another FSM to this FSM.
@@ -107,7 +136,7 @@ public class FSMStructure {
     }
 
     public Map<State, Map<State, Set<String>>> getTransitions() {
-        return transitions;
+        return this.transitions;
     }
 
     public Set<State> getStates() {
@@ -135,7 +164,7 @@ public class FSMStructure {
     }
 
     public String getExplanation() {
-        return explanation;
+        return this.explanation;
     }
 
     public Map<State, Set<String>> getTargetStatesAndSymbols(State sourceState) {

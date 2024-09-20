@@ -50,7 +50,7 @@ public class FSMSymbolConverter{
      */
     protected static void convertEmptyString(FSMStructure fsm) {
         State startEndState = new State(true, true);
-        fsm.addTransition(startEndState, null, startEndState);
+        fsm.addState(startEndState);
         fsm.setExpression(fsm.getExpression().isEmpty() ? String.valueOf(InputManager.getEmptySymbol()) : fsm.getExpression());
     }
 
@@ -62,7 +62,7 @@ public class FSMSymbolConverter{
      */
     private static void convertEmptySet(FSMStructure fsm) {
         State startState = new State(true, false);
-        fsm.addTransition(startState, Collections.emptySet(), null);
+        fsm.addState(startState);
         fsm.setExpression(fsm.getExpression().isEmpty() ? String.valueOf(InputManager.getEmptySet()) : fsm.getExpression());
     }
 

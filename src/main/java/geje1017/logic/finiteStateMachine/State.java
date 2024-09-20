@@ -157,7 +157,7 @@ public class State {
     public String toString() {
         return numbers.stream()
                 .sorted()
-                .map(number -> "q" + number)
+                .map(number -> "s" + number)
                 .collect(Collectors.joining(""));
     }
 }

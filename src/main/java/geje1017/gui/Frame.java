@@ -13,13 +13,12 @@ import java.awt.*;
  */
 public class Frame extends JFrame {
 
-    private static final String DEFAULT_REGEX = "i.e.: (a|1+)z*";
+    private static final String DEFAULT_REGEX = "e.g.: (0|\\0)+cd\\e";
     private static final Dimension MIN_SIZE = new Dimension(800, 500);
     private static final Dimension PREF_SIZE = new Dimension(1280, 720);
 
-    public static Dimension TRY;
-
-    private static int margin = 100;
+    public static int SCROLL_PANE_WIDTH;
+    private int margin = 100;
 
     private JPanel mainPanel;
     private JPanel inputPanel;
@@ -28,9 +27,6 @@ public class Frame extends JFrame {
     private JButton convertButton;
     public JPanel resultPanel;
     public JPanel solutionPanel;
-
-    public JPanel defaultPanel;
-
     private JScrollPane scrollPane;
     private JButton toggleSolutionButton;
 
@@ -54,17 +50,15 @@ public class Frame extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
         this.mainPanel = new JPanel(new GridBagLayout());
-        add(this.mainPanel);
+        this.add(this.mainPanel);
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int screenWidth = screenSize.width;
         int screenHeight = screenSize.height;
-
         int windowWidth = (int) (screenWidth * 0.8);
         int windowHeight = (int) (screenHeight * 0.8);
+        this.margin = windowWidth / 8;
         setSize(windowWidth, windowHeight);
-
-        margin = this.getWidth() / 8;
 
         this.setLocationRelativeTo(null);
         this.setResizable(false);
@@ -84,45 +78,42 @@ public class Frame extends JFrame {
         this.scrollPane = new JScrollPane();
 
         this.inputPanel.setBorder(new EmptyBorder(20, margin, 0, margin));
-        setupScrollPane();
+        scrollPaneForProcess();
+
+    }
+
+    public void defaultScrollPane() {
+        JPanel scrollContent = new JPanel();
+        this.scrollPane.setViewportView(scrollContent);
     }
 
     /**
      * Sets up the scroll pane based on whether the input field contains text.
      * If the input field is empty, it shows a blank panel.
      */
-    public void setupScrollPane() {
-        if (!textField.getText().trim().isEmpty()) {
+    public void scrollPaneForProcess() {
+        this.resultPanel = new JPanel();
+        this.resultPanel.setLayout(new BoxLayout(this.resultPanel, BoxLayout.Y_AXIS));
+        this.solutionPanel = new JPanel();
+        this.solutionPanel.setLayout(new BoxLayout(this.solutionPanel, BoxLayout.Y_AXIS));
 
-            this.resultPanel = new JPanel();
-            this.resultPanel.setLayout(new BoxLayout(this.resultPanel, BoxLayout.Y_AXIS));
+        this.toggleSolutionButton = new JButton();
+        this.toggleSolutionButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        this.toggleSolutionButton.addActionListener(e -> toggleSolutionPath());
+        toggleSolutionPath();
 
-            this.solutionPanel = new JPanel();
-            this.solutionPanel.setLayout(new BoxLayout(this.solutionPanel, BoxLayout.Y_AXIS));
-            this.solutionPanel.setVisible(false);
+        JPanel scrollContent = new JPanel();
+        scrollContent.setLayout(new BoxLayout(scrollContent, BoxLayout.Y_AXIS));
+        scrollContent.add(this.resultPanel);
+        scrollContent.add(Box.createRigidArea(new Dimension(0, 10)));
+        scrollContent.add(this.toggleSolutionButton);
+        scrollContent.add(Box.createRigidArea(new Dimension(0, 30)));
+        scrollContent.add(this.solutionPanel);
 
-            this.toggleSolutionButton = new JButton("Show Solution Path");
-            this.toggleSolutionButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-            this.toggleSolutionButton.addActionListener(e -> toggleSolutionPath());
-
-            JPanel scrollContent = new JPanel();
-            scrollContent.setLayout(new BoxLayout(scrollContent, BoxLayout.Y_AXIS));
-            scrollContent.add(this.resultPanel);
-            scrollContent.add(Box.createRigidArea(new Dimension(0, 10)));
-            scrollContent.add(this.toggleSolutionButton);
-            scrollContent.add(Box.createRigidArea(new Dimension(0, 10)));
-            scrollContent.add(this.solutionPanel);
-
-            this.scrollPane.setViewportView(scrollContent);
-        }
-        else {
-            JPanel scrollContent = new JPanel();
-            this.scrollPane.setViewportView(scrollContent);
-        }
-
-        this.scrollPane.setBorder(new EmptyBorder(0, margin, 20, margin));
-        TRY = scrollPane.getSize();
-        System.out.println("Try: " + TRY.width);
+        this.scrollPane.setViewportView(scrollContent);
+        this.scrollPane.setBorder(new EmptyBorder(10, margin, 0, margin));
+        this.scrollPane.setMaximumSize(new Dimension(scrollPane.getWidth(), scrollPane.getHeight()));
+        Frame.SCROLL_PANE_WIDTH = scrollPane.getWidth();
     }
 
     /**
@@ -132,7 +123,7 @@ public class Frame extends JFrame {
         GridBagConstraints inputGbc = new GridBagConstraints();
         inputGbc.insets = new Insets(0, 5, 0, 5);
 
-        JLabel label = new JLabel("Enter your regular expression here:");
+        JLabel label = new JLabel("Enter the regular expression to convert into an automaton here:");
         label.setFont(new Font("Arial", Font.BOLD, 14));
         inputGbc.gridx = 0;
         inputGbc.gridy = 0;
@@ -157,7 +148,6 @@ public class Frame extends JFrame {
         inputGbc.gridx = 0;
         inputGbc.gridy = 2;
         inputGbc.gridwidth = 2;
-        // inputGbc.weightx = 1;
         inputGbc.fill = GridBagConstraints.WEST;
         inputPanel.add(errorLabel, inputGbc);
 

@@ -22,7 +22,7 @@ public class FSMSimplifier {
     public static FSMStructure simplify(FSMStructure fsm) {
 
         FSMStructure simplifiedFSM = copyFsm(fsm);
-        simplifiedFSM.setExplanation("Renaming states to simplify and make the automaton more readable.\n");
+        simplifiedFSM.setExplanation("Renaming states to make the automaton more readable.\n");
 
         for (State currstate : simplifiedFSM.getStates()) {
             currstate.simplifyName();

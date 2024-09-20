@@ -24,7 +24,6 @@ public class ExpressionEvaluator {
     public FSMStorage evaluateExpression(String expression) {
         State.resetUniqueName();
         String postfixExpression = ExpressionConverter.convertInfixToPostfix(expression);
-        System.out.println("Postfix Expression: " + postfixExpression);
         return evaluatePostfixExpression(postfixExpression);
     }
 

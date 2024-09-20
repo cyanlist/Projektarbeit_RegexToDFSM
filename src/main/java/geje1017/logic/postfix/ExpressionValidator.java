@@ -7,7 +7,7 @@ package geje1017.logic.postfix;
  */
 public abstract class ExpressionValidator {
 
-    private static final int maxLengthExpression = 30;
+    private static final int maxLengthExpression = 35;
 
     /**
      * Validates an entire infix expression by applying multiple checks on its syntax.
@@ -27,6 +27,7 @@ public abstract class ExpressionValidator {
     }
 
     private static void checkLength(String expression) throws InvalidExpressionException {
+        if (expression.isEmpty()) throw new InvalidExpressionException("No expression given");
         if (expression.length() > maxLengthExpression) throw new InvalidExpressionException("Expression is too long");
     }
 
@@ -79,9 +80,7 @@ public abstract class ExpressionValidator {
         for (int i = 0; i < expression.length(); i++) {
             char c = expression.charAt(i);
 
-            // Prüfen, ob es ein unary operator ist
             if (InputManager.isUnaryOperator(c)) {
-                // Prüfen auf unzulässige Positionen (nach '(' oder '|')
                 if (i > 0) {
                     char previousChar = expression.charAt(i - 1);
                     if (previousChar == '(' || InputManager.isBinaryOperator(previousChar)) {
@@ -89,7 +88,6 @@ public abstract class ExpressionValidator {
                     }
                 }
 
-                // Überprüfung, ob der Ausdruck mit einem Unary-Operator beginnt
                 if (i == 0) {
                     throw new InvalidExpressionException("Expression cannot start with unary operator: " + c);
                 }
@@ -108,15 +106,12 @@ public abstract class ExpressionValidator {
         for (int i = 0; i < expression.length(); i++) {
             char c = expression.charAt(i);
 
-            // Prüfen, ob es ein binärer Operator ist
             if (InputManager.isBinaryOperator(c)) {
 
-                // Überprüfen auf unzulässige Platzierungen: Doppelte '|' oder am Anfang/Ende des Ausdrucks
                 if (i == 0 || i == expression.length() - 1) {
                     throw new InvalidExpressionException("Expression cannot start or end with binary operator: " + c);
                 }
 
-                // Prüfen, ob der vorherige oder nächste Charakter auch ein Operator ist
                 char previousChar = expression.charAt(i - 1);
                 char nextChar = expression.charAt(i + 1);
 

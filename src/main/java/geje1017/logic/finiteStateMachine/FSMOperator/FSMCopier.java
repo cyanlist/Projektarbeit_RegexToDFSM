@@ -35,7 +35,7 @@ public class FSMCopier {
         for (State oldState : fsm.getTransitions().keySet()) {
             State newState = new State(oldState);
             stateMapping.put(oldState, newState);
-            copy.addTransition(newState, null, null);
+            copy.addState(newState);
         }
         // Next, copy all transitions using the previously created state mapping.
         // This loop iterates over all entries in the original FSM transitions map.

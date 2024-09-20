@@ -123,7 +123,7 @@ public class FSMMinimizer {
             for (State state : partition) {
                 representativeMap.put(state, representative);
             }
-            minimizedFsm.addTransition(representative, null, null);
+            minimizedFsm.addState(representative);
         }
 
         // Add transitions to the minimized FSM

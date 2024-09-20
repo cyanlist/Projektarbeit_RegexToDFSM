@@ -1,5 +1,6 @@
 package geje1017.gui;
 
+import geje1017.gui.customGuiElements.ElementaryFSMPanel;
 import geje1017.gui.customGuiElements.FinalResultFSMPanel;
 import geje1017.gui.customGuiElements.IntermediateStepFSMPanel;
 import geje1017.logic.finiteStateMachine.FSMStructure;
@@ -59,9 +60,12 @@ public class Controller implements ActionListener, KeyListener {
      * evaluating the input expression, and updating the GUI.
      */
     private void processEvent() {
+
+        frame.defaultScrollPane();
+
         try {
             ExpressionValidator.validateInfix(frame.getInputFieldText());
-            this.frame.setupScrollPane();
+            this.frame.scrollPaneForProcess();
             cleanResult();
             processInput();
             updateGui();
@@ -97,6 +101,7 @@ public class Controller implements ActionListener, KeyListener {
         String inputText = frame.getInputFieldText();
         FSMStorage fsmStorage = evaluator.evaluateExpression(inputText);
 
+
         displayResultFSM(fsmStorage.getResultFsm());
         displayElementaryFSMs(fsmStorage.getElementaryFSMs());
         displayGroupedFSMs(fsmStorage.getFSMGroups());
@@ -108,7 +113,7 @@ public class Controller implements ActionListener, KeyListener {
      * @param fsm The FSM structure to display.
      */
     public void displayResultFSM(FSMStructure fsm) {
-        FinalResultFSMPanel resultPanel = new FinalResultFSMPanel(new FSMGroup(fsm, fsm, fsm, fsm)); // Simplified for elementary FSMs
+        FinalResultFSMPanel resultPanel = new FinalResultFSMPanel(new FSMGroup(fsm, fsm, fsm, fsm));
         frame.resultPanel.add(resultPanel);
     }
 
@@ -118,8 +123,8 @@ public class Controller implements ActionListener, KeyListener {
      * @param currFsm A list of FSM structures representing the elementary FSMs.
      */
     private void displayElementaryFSMs(List<FSMStructure> currFsm) {
-        /*ElementaryFSMPanel resultPanel = new ElementaryFSMPanel(currFsm);
-        frame.solutionPanel.add(resultPanel);*/
+        ElementaryFSMPanel resultPanel = new ElementaryFSMPanel(currFsm);
+        frame.solutionPanel.add(resultPanel);
     }
 
     /**
@@ -131,16 +136,6 @@ public class Controller implements ActionListener, KeyListener {
         for (FSMGroup group : groups) {
             addGroupResult(group);
         }
-    }
-
-    /**
-     * Adds the result of an FSM to the solution panel.
-     *
-     * @param fsm The FSM structure to display.
-     */
-    private void addResult(FSMStructure fsm) {
-        IntermediateStepFSMPanel resultPanel = new IntermediateStepFSMPanel(new FSMGroup(fsm, fsm, fsm, fsm)); // Simplified for elementary FSMs
-        frame.solutionPanel.add(resultPanel);
     }
 
     /**

@@ -21,20 +21,22 @@ public class FinalResultFSMPanel extends AbstractFSMPanel {
     public FinalResultFSMPanel(FSMGroup fsmGroup) {
         super(fsmGroup);
         resetStep();
+        toggleDetails();
     }
 
-    /**
-     * Sets up the panel by creating a title border and adding FSM details to the panel.
-     * This method is called when the panel is initialized.
-     */
     @Override
-    protected void setupPanel() {
+    protected void addMinimizedView() {
         GridBagConstraints gbc = createDefaultGBC();
+        gbc.fill = GridBagConstraints.CENTER;
 
         FSMStructure result = fsmGroup.getSimplifiedFSM();
-
-        this.setBorder(createTitledBorder("Final result: " + result.getExpression()));
+        this.setBorder(createTitledBorder("Your final result is: " + result.getExpression()));
         addFSMDetails(gbc, result);
+    }
+
+    @Override
+    protected void addExpandedView() {
+
     }
 
     /**
@@ -45,13 +47,13 @@ public class FinalResultFSMPanel extends AbstractFSMPanel {
      */
     private void addFSMDetails(GridBagConstraints gbc, FSMStructure fsm) {
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setResizeWeight(0.5);
-        splitPane.setContinuousLayout(true);
         splitPane.setLeftComponent(new FSMVisualizer(FSMCopier.copyFsm(fsm)));
 
-        JTextArea definitionArea = setupTextArea(new JTextArea(fsm.toString()));
-        splitPane.setRightComponent(new JScrollPane(definitionArea));
+        JTextArea definitionArea = setupTextArea(fsm.toString());
+        splitPane.setRightComponent(definitionArea);
 
+        splitPane.revalidate();
+        splitPane.repaint();
         detailsPanel.add(splitPane, gbc);
     }
 }

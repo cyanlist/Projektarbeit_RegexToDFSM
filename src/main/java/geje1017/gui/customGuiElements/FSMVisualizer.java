@@ -24,7 +24,6 @@ public class FSMVisualizer extends JPanel {
     private final Map<State, Point> statePositions;
     private StateRepresentation stateRepresentation;
     private TransitionRepresentation transitionRepresentation;
-
     /**
      * Constructs a visualizer for the given FSM structure.
      * Initializes the FSM, calculates the oval size, and computes state positions.
@@ -44,7 +43,7 @@ public class FSMVisualizer extends JPanel {
      * @return The calculated size for the state ovals.
      */
     private int calculateOvalSize() {
-        int availableWidth = Frame.TRY.width / 3;
+        int availableWidth = Frame.SCROLL_PANE_WIDTH / 3;
         int cols = (int) Math.ceil(Math.sqrt(fsm.getStates().size()));
         int calculatedSize = availableWidth / (cols * 2 + 1);
 
