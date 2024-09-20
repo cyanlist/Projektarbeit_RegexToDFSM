@@ -3,6 +3,8 @@
 ## Project Description
 This project provides a graphical application that allows users to convert regular expressions into deterministic finite automata (DFSM). The main goal of the software is to demonstrate the transformation of regular expressions step-by-step, providing transparency and a deeper understanding of the algorithms and concepts. The software is designed for students studying theoretical computer science as well as researchers and developers working with finite automata.
 
+![regex_to_dfsm.png](src/resources/regex_to_dfsm.png)
+
 ## Features
 - **Input of regular expressions**: Users can enter regular expressions through an input field.
 - **Visualization**: The resulting finite automaton is shown as a state diagram.
